@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container">
+    <section class="hero hero-shell">
+        <div class="hero-copy">
+            <div class="hero-badge" data-i18n="home.badge">Precision health intelligence</div>
+            <h1 data-i18n="home.title">Meet the AI layer for your health twin.</h1>
+            <p data-i18n="home.subtitle">HealthTwin brings prediction tools, daily vitals tracking, and an always-on medical assistant into one calm workspace designed to help you notice risk earlier and act with confidence.</p>
+            <div class="hero-actions">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('health.dashboard') }}" class="btn btn-primary" data-i18n="home.open_dashboard">Open dashboard</a>
+                <a href="{{ url_for('chatbot.chatbot_page') }}" class="btn btn-secondary" data-i18n="home.talk_ai">Talk to AI</a>
+                <a href="{{ url_for('health.history_page') }}" class="btn btn-secondary" data-i18n="home.review_history">Review history</a>
+                {% else %}
+                <a href="{{ url_for('auth.register') }}" class="btn btn-primary" data-i18n="home.create_account">Create free account</a>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-secondary" data-i18n="home.sign_in">Sign in</a>
+                {% endif %}
+            </div>
+            <div class="hero-inline-stats">
+                <div>
+                    <strong data-i18n="home.stat_models_title">3 core models</strong>
+                    <span data-i18n="home.stat_models_copy">Diabetes, heart, and MRI support</span>
+                </div>
+                <div>
+                    <strong data-i18n="home.stat_cockpit_title">1 unified cockpit</strong>
+                    <span data-i18n="home.stat_cockpit_copy">Predictions, watch data, and history</span>
+                </div>
+                <div>
+                    <strong data-i18n="home.stat_ai_title">24/7 AI guidance</strong>
+                    <span data-i18n="home.stat_ai_copy">Questions, explanations, and next steps</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-panel hero-panel-primary">
+                <div class="panel-kicker" data-i18n="home.snapshot_kicker">Live wellness snapshot</div>
+                <div class="hero-score-ring">
+                    <div class="hero-score-ring-inner">
+                        <span>84</span>
+                        <small data-i18n="home.health_score_small">health score</small>
+                    </div>
+                </div>
+                <div class="hero-signal-list">
+                    <div class="signal-row">
+                        <span data-i18n="home.recovery_trend">Recovery trend</span>
+                        <strong class="signal-positive" data-i18n="home.recovery_value">Stable</strong>
+                    </div>
+                    <div class="signal-row">
+                        <span data-i18n="home.sleep_consistency">Sleep consistency</span>
+                        <strong>7.5h avg</strong>
+                    </div>
+                    <div class="signal-row">
+                        <span data-i18n="home.heart_load">Heart load</span>
+                        <strong class="signal-warning" data-i18n="home.heart_load_value">Watch closely</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-panel hero-panel-secondary">
+                <div class="panel-kicker" data-i18n="home.covers_kicker">What HealthTwin covers</div>
+                <div class="hero-mini-grid">
+                    <article>
+                        <strong data-i18n="home.cover_predictions_title">Predictions</strong>
+                        <span data-i18n="home.cover_predictions_copy">ML support for key disease risk checks</span>
+                    </article>
+                    <article>
+                        <strong data-i18n="home.cover_assistant_title">Assistant</strong>
+                        <span data-i18n="home.cover_assistant_copy">Medical Q&A with retrieval-backed answers</span>
+                    </article>
+                    <article>
+                        <strong data-i18n="home.cover_tracking_title">Tracking</strong>
+                        <span data-i18n="home.cover_tracking_copy">Vitals, logs, charts, and wearable simulation</span>
+                    </article>
+                    <article>
+                        <strong data-i18n="home.cover_history_title">History</strong>
+                        <span data-i18n="home.cover_history_copy">See trends and identify changes over time</span>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-grid stats-grid-rich">
+        <div class="stat-card stat-card-highlight">
+            <div class="stat-value">3</div>
+            <div class="stat-label" data-i18n="home.stat_pipeline">Disease prediction pipelines</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">AI</div>
+            <div class="stat-label" data-i18n="home.stat_assistant">Medical assistant with contextual retrieval</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">360°</div>
+            <div class="stat-label" data-i18n="home.stat_view">View of logs, vitals, and simulated wearables</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">Fast</div>
+            <div class="stat-label" data-i18n="home.stat_fast">Analyze, save, and revisit your health snapshots</div>
+        </div>
+    </section>
+
+    <section class="section-intro">
+        <div>
+            <div class="section-eyebrow" data-i18n="home.modules_kicker">Platform modules</div>
+            <h2 data-i18n="home.modules_title">Everything important, one screen away.</h2>
+        </div>
+        <p data-i18n="home.modules_copy">Each tool is designed around practical health workflows: measure, assess, understand, and monitor.</p>
+    </section>
+
+    <div class="features-grid">
+        <div class="feature-card feature-card-large" onclick="location.href='{{ url_for('health.dashboard') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">📊</div>
+                <span class="feature-tag">Core hub</span>
+            </div>
+            <h3 data-i18n="home.card_dashboard_title">Health Dashboard</h3>
+            <p data-i18n="home.card_dashboard_copy">Calculate your health score, track key vitals, surface risk indicators, and ask for AI advice in the same workflow.</p>
+        </div>
+        <div class="feature-card" onclick="location.href='{{ url_for('health.history_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">📈</div>
+                <span class="feature-tag">Trends</span>
+            </div>
+            <h3 data-i18n="home.card_history_title">Health History</h3>
+            <p data-i18n="home.card_history_copy">Review saved logs over time with charts that reveal patterns in recovery, habits, and consistency.</p>
+        </div>
+        <div class="feature-card" onclick="location.href='{{ url_for('predictions.diabetes_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">🩸</div>
+                <span class="feature-tag">Prediction</span>
+            </div>
+            <h3 data-i18n="home.card_diabetes_title">Diabetes Risk</h3>
+            <p data-i18n="home.card_diabetes_copy">Estimate diabetes likelihood from core biometric inputs like glucose, BMI, age, and related factors.</p>
+        </div>
+        <div class="feature-card" onclick="location.href='{{ url_for('predictions.heart_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">❤️</div>
+                <span class="feature-tag">Prediction</span>
+            </div>
+            <h3 data-i18n="home.card_heart_title">Heart Disease Detection</h3>
+            <p data-i18n="home.card_heart_copy">Evaluate cardiovascular risk through blood pressure, cholesterol, ECG-linked signals, and other vitals.</p>
+        </div>
+        <div class="feature-card" onclick="location.href='{{ url_for('predictions.brain_tumor_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">🧠</div>
+                <span class="feature-tag">Imaging AI</span>
+            </div>
+            <h3 data-i18n="home.card_brain_title">Brain MRI Classifier</h3>
+            <p data-i18n="home.card_brain_copy">Use image-based deep learning support to classify MRI scans across major brain tumor categories.</p>
+        </div>
+        <div class="feature-card" onclick="location.href='{{ url_for('health.watch_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">⌚</div>
+                <span class="feature-tag">Wearables</span>
+            </div>
+            <h3 data-i18n="home.card_watch_title">Smart Watch Simulation</h3>
+            <p data-i18n="home.card_watch_copy">Explore heart rate, oxygen, stress, and activity streams through a companion wearable-style dashboard.</p>
+        </div>
+        <div class="feature-card feature-card-accent" onclick="location.href='{{ url_for('chatbot.chatbot_page') }}'">
+            <div class="feature-card-top">
+                <div class="feature-icon">🤖</div>
+                <span class="feature-tag">Conversational AI</span>
+            </div>
+            <h3 data-i18n="home.card_ai_title">AI Medical Assistant</h3>
+            <p data-i18n="home.card_ai_copy">Ask symptoms, treatment, recovery, and wellness questions in a focused interface built for guidance and clarity.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

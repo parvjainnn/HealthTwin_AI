@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Parkinson's Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header-block">
+        <h1>🧠 Parkinson's Disease Analysis</h1>
+        <p>Enter voice measurement data for analysis</p>
+    </div>
+    <div class="prediction-form-container">
+        <div class="form-card">
+            <form id="parkinsonsForm" onsubmit="return handlePredict(event, 'parkinsons')">
+                <div class="form-grid">
+                    <div class="form-group"><label>MDVP:Fo(Hz)</label><input type="number" name="fo" placeholder="e.g. 119.99" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Fhi(Hz)</label><input type="number" name="fhi" placeholder="e.g. 157.30" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Flo(Hz)</label><input type="number" name="flo" placeholder="e.g. 74.99" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Jitter(%)</label><input type="number" name="jitter_percent" placeholder="e.g. 0.00784" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Jitter(Abs)</label><input type="number" name="jitter_abs" placeholder="e.g. 0.00007" step="any" required></div>
+                    <div class="form-group"><label>MDVP:RAP</label><input type="number" name="rap" placeholder="e.g. 0.0037" step="any" required></div>
+                    <div class="form-group"><label>MDVP:PPQ</label><input type="number" name="ppq" placeholder="e.g. 0.00554" step="any" required></div>
+                    <div class="form-group"><label>Jitter:DDP</label><input type="number" name="ddp" placeholder="e.g. 0.01109" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Shimmer</label><input type="number" name="shimmer" placeholder="e.g. 0.04374" step="any" required></div>
+                    <div class="form-group"><label>MDVP:Shimmer(dB)</label><input type="number" name="shimmer_db" placeholder="e.g. 0.426" step="any" required></div>
+                    <div class="form-group"><label>Shimmer:APQ3</label><input type="number" name="apq3" placeholder="e.g. 0.02182" step="any" required></div>
+                    <div class="form-group"><label>Shimmer:APQ5</label><input type="number" name="apq5" placeholder="e.g. 0.0313" step="any" required></div>
+                    <div class="form-group"><label>MDVP:APQ</label><input type="number" name="apq" placeholder="e.g. 0.02971" step="any" required></div>
+                    <div class="form-group"><label>Shimmer:DDA</label><input type="number" name="dda" placeholder="e.g. 0.06545" step="any" required></div>
+                    <div class="form-group"><label>NHR</label><input type="number" name="nhr" placeholder="e.g. 0.02211" step="any" required></div>
+                    <div class="form-group"><label>HNR</label><input type="number" name="hnr" placeholder="e.g. 21.033" step="any" required></div>
+                    <div class="form-group"><label>RPDE</label><input type="number" name="rpde" placeholder="e.g. 0.414783" step="any" required></div>
+                    <div class="form-group"><label>DFA</label><input type="number" name="dfa" placeholder="e.g. 0.815285" step="any" required></div>
+                    <div class="form-group"><label>spread1</label><input type="number" name="spread1" placeholder="e.g. -4.813031" step="any" required></div>
+                    <div class="form-group"><label>spread2</label><input type="number" name="spread2" placeholder="e.g. 0.266482" step="any" required></div>
+                    <div class="form-group"><label>D2</label><input type="number" name="d2" placeholder="e.g. 2.301442" step="any" required></div>
+                    <div class="form-group"><label>PPE</label><input type="number" name="ppe" placeholder="e.g. 0.284654" step="any" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit">🔍 Analyze Parkinson's</button>
+            </form>
+            <div class="result-container" id="result-parkinsons"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/predict.js') }}"></script>{% endblock %}

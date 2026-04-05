@@ -1,0 +1,744 @@
+{% extends "base.html" %}
+{% block title %}MediBot — AI Medical Chat{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
+    --chat-shell-bg: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(237,248,240,0.94));
+    --chat-shell-border: rgba(68, 126, 94, 0.18);
+    --chat-shell-shadow: 0 30px 80px rgba(84, 122, 96, 0.16);
+    --chat-overlay-a: rgba(131, 213, 156, 0.2);
+    --chat-overlay-b: rgba(84, 184, 142, 0.16);
+    --chat-header-bg: linear-gradient(135deg, rgba(131,213,156,0.22), rgba(84,184,142,0.14));
+    --chat-kicker-bg: rgba(131,213,156,0.2);
+    --chat-kicker-border: rgba(47,159,116,0.18);
+    --chat-kicker-text: #2f9f74;
+    --chat-title: #123524;
+    --chat-copy: #5f8270;
+    --chat-panel: rgba(255,255,255,0.82);
+    --chat-panel-strong: rgba(255,255,255,0.92);
+    --chat-chip-bg: rgba(131,213,156,0.15);
+    --chat-chip-border: rgba(47,159,116,0.2);
+    --chat-chip-text: #2f9f74;
+    --chat-assistant-bg: rgba(245,255,248,0.98);
+    --chat-assistant-border: rgba(68,126,94,0.14);
+    --chat-user-bg: linear-gradient(135deg, #dff6e4, #c9efd4);
+    --chat-user-text: #123524;
+    --chat-input-bg: rgba(255,255,255,0.9);
+    --chat-input-border: rgba(68,126,94,0.16);
+    --chat-sidebar-bg: linear-gradient(180deg, rgba(255,255,255,0.88), rgba(237,248,240,0.78));
+    --chat-sidebar-title: #2f9f74;
+    --chat-header-title: #123524;
+    --chat-header-copy: #5f8270;
+    --chat-badge-bg: rgba(47, 159, 116, 0.12);
+    --chat-badge-border: rgba(47, 159, 116, 0.24);
+    --chat-badge-text: #1e7d5b;
+    --chat-chip-hover-bg: rgba(47,159,116,0.16);
+    --chat-chip-hover-border: rgba(47,159,116,0.34);
+    --chat-chip-hover-text: #123524;
+    --chat-assistant-text: #274635;
+    --chat-assistant-strong: #123524;
+    --chat-assistant-em: #5f8270;
+    --chat-input-shell-bg: rgba(255,255,255,0.72);
+    --chat-resource-bg: rgba(255,255,255,0.74);
+    --chat-resource-hover-bg: rgba(131,213,156,0.14);
+    --chat-resource-title: #173727;
+    --chat-resource-detail: #5f8270;
+    --chat-topic-bg: rgba(255,255,255,0.74);
+    --chat-topic-text: #345745;
+    --chat-topic-hover-bg: rgba(131,213,156,0.18);
+    --chat-topic-hover-text: #123524;
+    --chat-note-text: #557160;
+}
+
+.dark-theme {
+    --chat-shell-bg: linear-gradient(180deg, rgba(9, 16, 34, 0.94), rgba(11, 20, 41, 0.9));
+    --chat-shell-border: rgba(94, 234, 212, 0.16);
+    --chat-shell-shadow: 0 30px 80px rgba(0,0,0,0.38);
+    --chat-overlay-a: rgba(45, 212, 191, 0.14);
+    --chat-overlay-b: rgba(59, 130, 246, 0.12);
+    --chat-header-bg: linear-gradient(135deg, rgba(45,212,191,0.12), rgba(59,130,246,0.08));
+    --chat-kicker-bg: rgba(14,165,233,0.08);
+    --chat-kicker-border: rgba(45,212,191,0.18);
+    --chat-kicker-text: #99f6e4;
+    --chat-title: #f8fafc;
+    --chat-copy: #94a3b8;
+    --chat-panel: rgba(15, 23, 42, 0.6);
+    --chat-panel-strong: rgba(15, 23, 42, 0.92);
+    --chat-chip-bg: rgba(14,165,233,0.08);
+    --chat-chip-border: rgba(45,212,191,0.22);
+    --chat-chip-text: #b6f4ec;
+    --chat-assistant-bg: rgba(15, 23, 42, 0.88);
+    --chat-assistant-border: rgba(45,212,191,0.14);
+    --chat-user-bg: linear-gradient(135deg, #0f172a, #1e293b);
+    --chat-user-text: #ffffff;
+    --chat-input-bg: rgba(15,23,42,0.92);
+    --chat-input-border: rgba(148,163,184,0.16);
+    --chat-sidebar-bg: linear-gradient(180deg, rgba(8, 15, 30, 0.82), rgba(10, 18, 34, 0.74));
+    --chat-sidebar-title: #7dd3fc;
+    --chat-header-title: #e2e8f0;
+    --chat-header-copy: #94a3b8;
+    --chat-badge-bg: rgba(15, 118, 110, 0.14);
+    --chat-badge-border: rgba(45, 212, 191, 0.28);
+    --chat-badge-text: #99f6e4;
+    --chat-chip-hover-bg: rgba(14,165,233,0.18);
+    --chat-chip-hover-border: rgba(45,212,191,0.4);
+    --chat-chip-hover-text: #ecfeff;
+    --chat-assistant-text: #dbe6f5;
+    --chat-assistant-strong: #e2e8f0;
+    --chat-assistant-em: #94a3b8;
+    --chat-input-shell-bg: rgba(7,14,29,0.75);
+    --chat-resource-bg: rgba(15, 23, 42, 0.6);
+    --chat-resource-hover-bg: rgba(14,165,233,0.1);
+    --chat-resource-title: #e2e8f0;
+    --chat-resource-detail: #64748b;
+    --chat-topic-bg: rgba(15,23,42,0.5);
+    --chat-topic-text: #cbd5e1;
+    --chat-topic-hover-bg: rgba(14,165,233,0.12);
+    --chat-topic-hover-text: #ecfeff;
+    --chat-note-text: #94a3b8;
+}
+
+/* ── Page layout ── */
+.chatbot-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    max-width: 1300px;
+    margin: 2rem auto;
+    padding: 0 1.5rem 2rem;
+    min-height: calc(100vh - 140px);
+}
+@media (max-width: 900px) {
+    .chatbot-wrapper { grid-template-columns: 1fr; }
+    .sidebar-panel { display: none; }
+}
+
+.chat-page-intro {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+.chat-page-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: var(--chat-kicker-bg);
+    border: 1px solid var(--chat-kicker-border);
+    color: var(--chat-kicker-text);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.65rem;
+}
+.chat-page-intro h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 3vw, 2.7rem);
+    line-height: 1.05;
+    color: var(--chat-title);
+}
+.chat-page-intro p {
+    max-width: 420px;
+    margin: 0;
+    color: var(--chat-copy);
+    font-size: 0.92rem;
+    line-height: 1.7;
+}
+@media (max-width: 900px) {
+    .chat-page-intro {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .chat-page-intro p {
+        max-width: none;
+    }
+}
+
+/* ── Chat card ── */
+.chat-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--chat-shell-bg);
+    border: 1px solid var(--chat-shell-border);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: var(--chat-shell-shadow);
+    backdrop-filter: blur(20px);
+    height: 82vh;
+    position: relative;
+}
+.chat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top left, var(--chat-overlay-a), transparent 30%),
+        radial-gradient(circle at bottom right, var(--chat-overlay-b), transparent 28%);
+    pointer-events: none;
+}
+
+/* ── Chat header ── */
+.chat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--chat-header-bg);
+    border-bottom: 1px solid rgba(148,163,184,0.14);
+}
+.chat-avatar-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+.chat-avatar {
+    width: 46px; height: 46px;
+    background: linear-gradient(135deg, #0ea5e9, #2dd4bf);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 15px rgba(99,102,241,0.4);
+}
+.online-dot {
+    position: absolute; bottom: 2px; right: 2px;
+    width: 10px; height: 10px;
+    background: #22c55e; border-radius: 50%;
+    border: 2px solid #0f172a;
+    animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+    0%,100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+    50%      { box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+.chat-header-info h2 {
+    font-size: 1rem; font-weight: 700; color: var(--chat-header-title); margin: 0;
+}
+.chat-header-info p {
+    font-size: 0.75rem; color: var(--chat-header-copy); margin: 2px 0 0;
+}
+.chat-header-badge {
+    margin-left: auto;
+    background: var(--chat-badge-bg);
+    border: 1px solid var(--chat-badge-border);
+    color: var(--chat-badge-text);
+    font-size: 0.7rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* ── Mental health alert banner ── */
+.mh-alert {
+    display: none;
+    margin: 0.8rem 1rem 0;
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    animation: slideDown 0.3s ease;
+}
+.mh-alert.show { display: block; }
+.mh-alert.severity-high {
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: #fca5a5;
+}
+.mh-alert.severity-medium {
+    background: rgba(234,179,8,0.12);
+    border: 1px solid rgba(234,179,8,0.35);
+    color: #fde68a;
+}
+.mh-alert.severity-low {
+    background: rgba(99,102,241,0.12);
+    border: 1px solid rgba(99,102,241,0.35);
+    color: #c7d2fe;
+}
+.mh-alert strong { display: block; margin-bottom: 4px; font-size: 0.85rem; }
+.mh-hotlines { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.mh-hotlines a {
+    background: rgba(255,255,255,0.08); border-radius: 20px;
+    padding: 3px 10px; font-size: 0.72rem; color: inherit;
+    text-decoration: none; white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.2s;
+}
+.mh-hotlines a:hover { background: rgba(255,255,255,0.15); }
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Quick chips ── */
+.quick-chips {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 0.9rem 1rem 0;
+}
+.chip {
+    background: var(--chat-chip-bg);
+    border: 1px solid var(--chat-chip-border);
+    color: var(--chat-chip-text); font-size: 0.73rem;
+    padding: 7px 12px; border-radius: 999px;
+    cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.chip:hover { background: var(--chat-chip-hover-bg); border-color: var(--chat-chip-hover-border); color: var(--chat-chip-hover-text); transform: translateY(-1px); }
+
+/* ── Messages area ── */
+.chat-messages {
+    flex: 1; overflow-y: auto; padding: 1.2rem;
+    display: flex; flex-direction: column; gap: 1rem;
+    scroll-behavior: smooth;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 4px; }
+
+/* ── Bubbles ── */
+.message-row { display: flex; align-items: flex-end; gap: 10px; }
+.message-row.user { flex-direction: row-reverse; }
+
+.bubble-avatar {
+    width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 1rem;
+}
+.row-assistant .bubble-avatar { background: linear-gradient(135deg,#6366f1,#a855f7); }
+.row-assistant .bubble-avatar { background: linear-gradient(135deg,#0ea5e9,#2dd4bf); }
+.row-user .bubble-avatar { background: linear-gradient(135deg,#0f172a,#334155); }
+
+.bubble {
+    max-width: 72%; padding: 0.95rem 1.1rem;
+    border-radius: 20px; font-size: 0.89rem; line-height: 1.7;
+    word-break: break-word;
+}
+.row-assistant .bubble {
+    background: var(--chat-assistant-bg);
+    border: 1px solid var(--chat-assistant-border);
+    border-bottom-left-radius: 6px;
+    color: var(--chat-assistant-text);
+}
+.row-user .bubble {
+    background: var(--chat-user-bg);
+    border: 1px solid rgba(148,163,184,0.18);
+    border-bottom-right-radius: 6px;
+    color: var(--chat-user-text);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.22);
+}
+
+/* Markdown rendering */
+.bubble strong { color: var(--chat-assistant-strong); font-weight: 600; }
+.bubble em { color: var(--chat-assistant-em); }
+.bubble ul, .bubble ol { padding-left: 1.2rem; margin: 0.4rem 0; }
+.bubble li { margin: 0.2rem 0; }
+.bubble p { margin: 0.3rem 0; }
+.bubble .warning-tag {
+    display: inline-block; margin-top: 8px;
+    font-size: 0.75rem; color: #f59e0b;
+    background: rgba(245,158,11,0.1); padding: 3px 8px; border-radius: 6px;
+}
+
+/* Typing dots */
+.typing-bubble { display: flex; align-items: center; gap: 5px; padding: 1rem 1.2rem; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #6366f1; animation: bounce 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+    0%,80%,100% { transform: scale(0.7); opacity: 0.5; }
+    40%          { transform: scale(1.1); opacity: 1; }
+}
+
+/* ── Input area ── */
+.chat-input-area {
+    display: flex; align-items: center; gap: 10px;
+    padding: 1rem 1.1rem 1.1rem;
+    border-top: 1px solid rgba(148,163,184,0.12);
+    background: var(--chat-input-shell-bg);
+}
+#chatInput {
+    flex: 1; background: var(--chat-input-bg);
+    border: 1px solid var(--chat-input-border); border-radius: 16px;
+    color: var(--text-primary); padding: 0.85rem 1rem; font-size: 0.9rem;
+    outline: none; transition: border-color 0.2s;
+    font-family: inherit;
+}
+#chatInput:focus { border-color: rgba(45,212,191,0.6); box-shadow: 0 0 0 3px rgba(45,212,191,0.08); }
+#chatInput::placeholder { color: #64748b; }
+.send-btn {
+    width: 44px; height: 44px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #0ea5e9, #2dd4bf);
+    color: #fff; font-size: 1.1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; box-shadow: 0 8px 18px rgba(14,165,233,0.25);
+}
+.send-btn:hover:not(:disabled) { transform: translateY(-1px) scale(1.03); box-shadow: 0 10px 24px rgba(45,212,191,0.28); }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Sidebar ── */
+.sidebar-panel { display: flex; flex-direction: column; gap: 1.2rem; }
+
+.sidebar-card {
+    background: var(--chat-sidebar-bg);
+    border: 1px solid rgba(148,163,184,0.14);
+    border-radius: 20px; padding: 1.2rem;
+    backdrop-filter: blur(20px);
+}
+.sidebar-card h3 {
+    font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--chat-sidebar-title); margin: 0 0 1rem;
+    display: flex; align-items: center; gap: 6px;
+}
+.mh-resource {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 0.7rem; border-radius: 10px;
+    background: var(--chat-resource-bg);
+    border: 1px solid rgba(148,163,184,0.1);
+    margin-bottom: 0.6rem; transition: background 0.2s;
+}
+.mh-resource:hover { background: var(--chat-resource-hover-bg); }
+.mh-resource-icon { font-size: 1.3rem; flex-shrink: 0; }
+.mh-resource-info { flex: 1; }
+.mh-resource-name { font-size: 0.78rem; font-weight: 600; color: var(--chat-resource-title); }
+.mh-resource-detail { font-size: 0.7rem; color: var(--chat-resource-detail); margin-top: 2px; }
+.mh-resource-number {
+    display: inline-block; margin-top: 4px;
+    font-size: 0.72rem; font-weight: 700; color: #22c55e;
+    background: rgba(45,212,191,0.1); padding: 2px 8px; border-radius: 20px;
+}
+
+.topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.topic-btn {
+    background: var(--chat-topic-bg); border: 1px solid rgba(148,163,184,0.12);
+    border-radius: 12px; padding: 10px 6px; text-align: center;
+    cursor: pointer; transition: all 0.2s; color: var(--chat-topic-text); font-size: 0.72rem;
+}
+.topic-btn:hover { background: var(--chat-topic-hover-bg); color: var(--chat-topic-hover-text); transform: translateY(-1px); border-color: rgba(45,212,191,0.24); }
+.topic-btn .t-icon { font-size: 1.2rem; display: block; margin-bottom: 2px; }
+
+.sidebar-note {
+    font-size: 0.7rem; color: var(--chat-note-text); line-height: 1.5;
+    padding: 0.8rem; background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.15); border-radius: 8px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chatbot-wrapper">
+
+    <!-- ── Main Chat Panel ── -->
+    <div style="display:flex; flex-direction:column; gap:0;">
+        <div class="chat-page-intro">
+            <div>
+                <div class="chat-page-kicker">HealthTwin AI</div>
+                <h1>Ask health questions in a calmer, more focused workspace.</h1>
+            </div>
+            <p>MediBot is best for medical education, symptom explanations, and wellness guidance. It is not a replacement for urgent or professional care.</p>
+        </div>
+        <div class="chat-card" id="mainChatCard">
+
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="chat-avatar-wrapper">
+                    <div class="chat-avatar">🧬</div>
+                    <span class="online-dot"></span>
+                </div>
+                <div class="chat-header-info">
+                    <h2>MediBot</h2>
+                    <p>RAG · Gale Medical Encyclopedia · llama3.2</p>
+                </div>
+                <span class="chat-header-badge">AI Medical Assistant</span>
+            </div>
+
+            <!-- Mental Health Alert Banner -->
+            <div class="mh-alert" id="mhAlert">
+                <strong id="mhAlertTitle">💚 We're here for you</strong>
+                <span id="mhAlertMsg">If you're struggling, please reach out — you don't have to face this alone.</span>
+                <div class="mh-hotlines" id="mhHotlines"></div>
+            </div>
+
+            <!-- Quick Chips -->
+            <div class="quick-chips" id="quickChips">
+                <span class="chip" onclick="sendQuick('What are the symptoms of diabetes?')">🩸 Diabetes symptoms</span>
+                <span class="chip" onclick="sendQuick('How do I lower my blood pressure naturally?')">❤️ Lower blood pressure</span>
+                <span class="chip" onclick="sendQuick('I feel anxious and stressed all the time')">😟 Anxiety & stress</span>
+                <span class="chip" onclick="sendQuick('What are signs of depression?')">🧠 Depression signs</span>
+                <span class="chip" onclick="sendQuick('How to improve sleep quality?')">😴 Better sleep</span>
+                <span class="chip" onclick="sendQuick('What should I eat for a healthy heart?')">🥗 Heart-healthy diet</span>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message-row row-assistant">
+                    <div class="bubble-avatar">🧬</div>
+                    <div class="bubble">
+                        <strong>👋 Hello! I'm MediBot</strong><br>
+                        I'm a RAG-powered medical assistant trained on the <em>Gale Encyclopedia of Medicine</em>. I can answer questions about diseases, symptoms, treatments, mental health, and wellness.<br><br>
+                        💬 Type a question or tap a quick-start chip above to begin.<br>
+                        <span class="warning-tag">⚠️ For educational use only — always consult a qualified healthcare professional.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" autocomplete="off"
+                    placeholder="Ask a medical question or describe how you feel..."
+                    onkeydown="if(event.key==='Enter') sendChat()">
+                <button class="send-btn" id="chatSendBtn" onclick="sendChat()" title="Send message">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </div>
+
+        </div><!-- /chat-card -->
+    </div><!-- /main panel -->
+
+    <!-- ── Sidebar ── -->
+    <div class="sidebar-panel">
+
+        <!-- Mental Health Resources -->
+        <div class="sidebar-card">
+            <h3>💚 Mental Health Resources</h3>
+            <div class="mh-resource">
+                <div class="mh-resource-icon">📞</div>
+                <div class="mh-resource-info">
+                    <div class="mh-resource-name">iCall — TISS</div>
+                    <div class="mh-resource-detail">Professional counselling (Mon–Sat, 8am–10pm)</div>
+                    <span class="mh-resource-number">9152987821</span>
+                </div>
+            </div>
+            <div class="mh-resource">
+                <div class="mh-resource-icon">🆘</div>
+                <div class="mh-resource-info">
+                    <div class="mh-resource-name">Vandrevala Foundation</div>
+                    <div class="mh-resource-detail">24/7 crisis helpline</div>
+                    <span class="mh-resource-number">1860-2662-345</span>
+                </div>
+            </div>
+            <div class="mh-resource">
+                <div class="mh-resource-icon">🌙</div>
+                <div class="mh-resource-info">
+                    <div class="mh-resource-name">iCall Whatsapp</div>
+                    <div class="mh-resource-detail">Text-based mental health support</div>
+                    <span class="mh-resource-number">9152987821</span>
+                </div>
+            </div>
+            <div class="mh-resource">
+                <div class="mh-resource-icon">🏥</div>
+                <div class="mh-resource-info">
+                    <div class="mh-resource-name">NIMHANS Helpline</div>
+                    <div class="mh-resource-detail">National Mental Health Helpline</div>
+                    <span class="mh-resource-number">080-46110007</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Explorer -->
+        <div class="sidebar-card">
+            <h3>🔍 Explore Topics</h3>
+            <div class="topic-grid">
+                <div class="topic-btn" onclick="sendQuick('Explain diabetes mellitus types and symptoms')">
+                    <span class="t-icon">🩸</span>Diabetes
+                </div>
+                <div class="topic-btn" onclick="sendQuick('What is hypertension and how is it treated?')">
+                    <span class="t-icon">❤️</span>Heart
+                </div>
+                <div class="topic-btn" onclick="sendQuick('What are symptoms of clinical depression and treatment options?')">
+                    <span class="t-icon">🧠</span>Depression
+                </div>
+                <div class="topic-btn" onclick="sendQuick('How is anxiety disorder diagnosed and managed?')">
+                    <span class="t-icon">😰</span>Anxiety
+                </div>
+                <div class="topic-btn" onclick="sendQuick('What causes chronic fatigue and how to treat it?')">
+                    <span class="t-icon">😴</span>Fatigue
+                </div>
+                <div class="topic-btn" onclick="sendQuick('What are signs of vitamin deficiency?')">
+                    <span class="t-icon">💊</span>Vitamins
+                </div>
+                <div class="topic-btn" onclick="sendQuick('How to manage stress effectively?')">
+                    <span class="t-icon">🧘</span>Stress
+                </div>
+                <div class="topic-btn" onclick="sendQuick('What is BMI and what does it mean for health?')">
+                    <span class="t-icon">⚖️</span>BMI
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="sidebar-card">
+            <div class="sidebar-note">
+                ⚠️ <strong>Important:</strong> MediBot provides general medical information only. It is not a substitute for professional medical advice, diagnosis, or treatment. In emergencies, call <strong>112</strong>.
+            </div>
+        </div>
+
+    </div><!-- /sidebar -->
+</div><!-- /chatbot-wrapper -->
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// ── State ──────────────────────────────────────────────────────────────
+let chatHistory = [];
+
+// ── Markdown renderer (lightweight) ────────────────────────────────────
+function renderMarkdown(text) {
+    return text
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/⚠️([^\n]+)/g, '<span class="warning-tag">⚠️$1</span>')
+        .replace(/^#{1,3}\s+(.+)$/gm, '<strong>$1</strong>')
+        .replace(/^[-•]\s+(.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+}
+
+// ── Append a chat message row ───────────────────────────────────────────
+function appendMessage(role, htmlContent) {
+    const container = document.getElementById('chatMessages');
+    const row = document.createElement('div');
+    row.className = `message-row row-${role}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'bubble-avatar';
+    avatar.textContent = role === 'user' ? '👤' : '🧬';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = htmlContent;
+
+    if (role === 'user') {
+        row.appendChild(bubble);
+        row.appendChild(avatar);
+    } else {
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+    }
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
+    return bubble;
+}
+
+// ── Typing indicator ────────────────────────────────────────────────────
+function showTyping() {
+    const container = document.getElementById('chatMessages');
+    const row = document.createElement('div');
+    row.className = 'message-row row-assistant';
+    row.id = 'typingRow';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'bubble-avatar';
+    avatar.textContent = '🧬';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble typing-bubble';
+    bubble.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+    row.appendChild(avatar);
+    row.appendChild(bubble);
+    container.appendChild(row);
+    container.scrollTop = container.scrollHeight;
+}
+function hideTyping() {
+    const el = document.getElementById('typingRow');
+    if (el) el.remove();
+}
+
+// ── Mental health banner ────────────────────────────────────────────────
+const MH_CONFIGS = {
+    high: {
+        title: '🆘 We Care About You',
+        msg: 'You mentioned something that concerns us. You are not alone — please reach out to a crisis helpline right now.',
+        hotlines: [
+            { name: 'iCall (TISS)', num: '9152987821' },
+            { name: 'Vandrevala 24/7', num: '1860-2662-345' },
+            { name: 'Emergency', num: '112' }
+        ]
+    },
+    medium: {
+        title: '💜 Support Is Available',
+        msg: 'It sounds like you\'re going through a difficult time. Speaking to a mental health professional can really help.',
+        hotlines: [
+            { name: 'iCall', num: '9152987821' },
+            { name: 'NIMHANS', num: '080-46110007' }
+        ]
+    },
+    low: {
+        title: '💚 Taking Care of Yourself Matters',
+        msg: 'Stress and difficult emotions are real. MediBot can offer information, but a counselor can offer much more.',
+        hotlines: [
+            { name: 'iCall', num: '9152987821' }
+        ]
+    }
+};
+
+function showMHAlert(mh) {
+    if (!mh || !mh.detected) return;
+    const banner = document.getElementById('mhAlert');
+    const cfg = MH_CONFIGS[mh.severity] || MH_CONFIGS.low;
+
+    banner.className = `mh-alert show severity-${mh.severity}`;
+    document.getElementById('mhAlertTitle').textContent = cfg.title;
+    document.getElementById('mhAlertMsg').textContent = cfg.msg;
+
+    const hotlinesEl = document.getElementById('mhHotlines');
+    hotlinesEl.innerHTML = cfg.hotlines.map(h =>
+        `<a href="tel:${h.num}">📞 ${h.name}: ${h.num}</a>`
+    ).join('');
+}
+
+// ── Main send function ──────────────────────────────────────────────────
+async function sendChat() {
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('chatSendBtn');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    // Hide chips after first message
+    document.getElementById('quickChips').style.display = 'none';
+
+    input.value = '';
+    input.disabled = true;
+    sendBtn.disabled = true;
+
+    appendMessage('user', escapeHtml(msg));
+    chatHistory.push({ role: 'user', content: msg });
+    showTyping();
+
+    try {
+        const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: msg, history: chatHistory })
+        });
+        const data = await res.json();
+        hideTyping();
+
+        const answer = data.response || data.error || '⚠️ No response received.';
+        appendMessage('assistant', renderMarkdown(answer));
+        chatHistory.push({ role: 'assistant', content: answer });
+
+        // Mental health detection
+        if (data.mental_health) showMHAlert(data.mental_health);
+
+    } catch (err) {
+        hideTyping();
+        appendMessage('assistant', '⚠️ Connection error. Make sure Ollama is running: <code>ollama run llama3.2</code>');
+    }
+
+    input.disabled = false;
+    sendBtn.disabled = false;
+    input.focus();
+}
+
+function sendQuick(text) {
+    document.getElementById('chatInput').value = text;
+    sendChat();
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+{% endblock %}

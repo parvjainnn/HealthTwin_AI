@@ -1,0 +1,46 @@
+# HealthTwin Flask App – Task Checklist
+
+## Phase 1: Planning
+- [x] Analyze existing Streamlit dashboard ([dashboard/app.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/dashboard/app.py))
+- [x] Analyze existing FastAPI app (`app/`) structure
+- [x] Plan Flask app architecture
+
+## Phase 2: Flask Backend
+- [ ] Create `flask_app/` directory structure
+- [ ] `flask_app/app.py` – Flask application factory + routes
+- [ ] `flask_app/auth.py` – Login/register/logout routes + session management
+- [ ] `flask_app/health.py` – Health analytics routes (analyze, save log, history, AI advisor)
+- [ ] `flask_app/predictions.py` – Diabetes/Heart/Parkinson's ML prediction routes
+- [ ] `flask_app/chatbot.py` – AI chatbot route
+- [ ] `flask_app/database.py` – SQLite DB helpers (users + health_logs tables)
+- [ ] `flask_app/ml_models.py` – ML models (risk classification + disease prediction)
+- [ ] `flask_app/ai_advisor.py` – Rule-based AI advisor logic
+
+## Phase 3: Frontend Templates
+- [ ] `templates/base.html` – Base layout with navbar
+- [ ] `templates/login.html` – Login page
+- [ ] `templates/register.html` – Register page
+- [ ] `templates/index.html` – Home/landing page
+- [ ] `templates/dashboard.html` – Main dashboard with health history charts
+- [ ] `templates/history.html` – Full health history page
+- [ ] `templates/diabetes.html` – Diabetes prediction form
+- [ ] `templates/heart.html` – Heart disease prediction form
+- [ ] `templates/parkinsons.html` – Parkinson's prediction form
+- [ ] `templates/chatbot.html` – AI chat interface
+- [ ] `templates/watch.html` – Smartwatch simulation
+
+## Phase 4: Static Assets
+- [ ] `static/css/styles.css` – Premium dark UI styles
+- [ ] `static/js/charts.js` – Chart.js integration for health history visualization
+- [ ] `static/js/app.js` – General JS utilities
+
+## Phase 5: Configuration
+- [ ] `run.py` – Flask entry point
+- [ ] `requirements_flask.txt` – Flask dependencies
+
+## Phase 6: Verification
+- [ ] Start Flask app and verify it runs
+- [ ] Test login/register flow
+- [ ] Test dashboard analysis + save log
+- [ ] Test health history display with charts
+- [ ] Test ML predictions

@@ -1,0 +1,524 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="hero-title" data-i18n="dashboard.title">📊 Health Dashboard</h1>
+            <p class="hero-subtitle"><span data-i18n="dashboard.welcome">Welcome back,</span> <span class="accent-text">{{ current_user.username }}</span></p>
+        </div>
+        <div id="scoreBadge" class="score-hero" style="display:none;">
+            <div class="score-label" data-i18n="dashboard.health_score">Health Score</div>
+            <div class="score-value" id="scoreVal">--</div>
+            <div class="score-sub" data-i18n="dashboard.out_of_100">out of 100</div>
+        </div>
+    </div>
+
+    <!-- ── Vitals Form & Quick Results ── -->
+    <div class="dashboard-layout">
+        <!-- Sidebar Form -->
+        <div class="dashboard-sidebar">
+            <div class="form-card">
+            <h3 class="sidebar-title" data-i18n="dashboard.vitals">👤 Your Vitals</h3>
+                <div class="form-group">
+                    <label data-i18n="form.gender">Gender</label>
+                    <select id="dash-gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form.age">Age</label>
+                    <input type="number" id="dash-age" value="28" min="10" max="100">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label data-i18n="form.weight">Weight (kg)</label>
+                        <input type="number" id="dash-weight" value="72" min="30" max="200" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="form.height">Height (cm)</label>
+                        <input type="number" id="dash-height" value="175" min="100" max="220">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form.steps">Daily Steps</label>
+                    <input type="number" id="dash-steps" value="6500" min="0" max="50000" step="500">
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form.sleep">Sleep (hours)</label>
+                    <input type="range" id="dash-sleep" value="6.5" min="0" max="12" step="0.5" oninput="document.getElementById('sleepVal').textContent = this.value + 'h'">
+                    <div class="range-label"><span id="sleepVal">6.5h</span></div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form.water">Water (litres)</label>
+                    <input type="range" id="dash-water" value="2.0" min="0" max="10" step="0.25" oninput="document.getElementById('waterVal').textContent = this.value + 'L'">
+                    <div class="range-label"><span id="waterVal">2.0L</span></div>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="form.heart_rate">Heart Rate (bpm)</label>
+                    <input type="number" id="dash-hr" value="72" min="30" max="220">
+                </div>
+                <div class="dashboard-actions">
+                    <button class="btn btn-primary" onclick="analyzeDashboard()" data-i18n="dashboard.analyze">🔍 Analyze</button>
+                    <button class="btn btn-secondary" onclick="saveLog()" data-i18n="dashboard.save_log">💾 Save Log</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="dashboard-main">
+            <div id="dashboardPlaceholder" class="dashboard-placeholder">
+                <div class="placeholder-icon">📊</div>
+                <p data-i18n="dashboard.placeholder">Enter your vitals and click Analyze to see your health metrics</p>
+                {% if history %}
+                <p style="margin-top:0.5rem; font-size:0.8rem; color:#64748b;">
+                    You have {{ history|length }} saved log(s). Scroll down to view history.
+                </p>
+                {% endif %}
+            </div>
+
+            <div id="dashboardResults" style="display:none;">
+                <!-- KPI Row -->
+                <div class="kpi-grid" id="kpiGrid"></div>
+
+                <!-- Score breakdown -->
+                <div class="section-header" data-i18n="dashboard.breakdown">Health Score Breakdown</div>
+                <div class="breakdown-grid">
+                    <div class="breakdown-gauge">
+                        <canvas id="gaugeCanvas" width="220" height="140"></canvas>
+                        <div class="gauge-label" data-i18n="dashboard.overall_score">Overall Score</div>
+                    </div>
+                    <div class="breakdown-bars" id="breakdownBars"></div>
+                </div>
+
+                <!-- Risk summary -->
+                <div class="section-header" data-i18n="dashboard.risk_summary">Risk Summary</div>
+                <div class="risk-grid" id="riskGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header" style="margin-top:2.5rem;" data-i18n="records.vault">🧾 Medical Records Vault</div>
+    <div class="records-layout">
+        <div class="records-upload-card">
+            <h3 class="sidebar-title" data-i18n="records.add_title">Add Bills & Prescriptions</h3>
+            <p class="records-copy" data-i18n="records.add_copy">Upload hospital bills or doctor prescriptions so they stay attached to your account for future access.</p>
+            <form method="POST" action="{{ url_for('health.upload_record') }}" enctype="multipart/form-data" class="records-form">
+                <div class="form-group">
+                    <label data-i18n="records.document_type">Document Type</label>
+                    <select name="document_type" required>
+                        <option value="bill" data-i18n="records.bill">Bill</option>
+                        <option value="prescription" data-i18n="records.prescription">Prescription</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="records.title">Title</label>
+                    <input type="text" name="title" placeholder="Apollo bill - March 2026" data-i18n-placeholder="records.title_placeholder" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="records.notes">Notes</label>
+                    <textarea name="notes" rows="3" placeholder="Doctor name, visit reason, amount paid, or any reminder" data-i18n-placeholder="records.notes_placeholder"></textarea>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="records.file">File</label>
+                    <input type="file" name="document_file" accept=".pdf,.png,.jpg,.jpeg,.webp" required>
+                </div>
+                <button class="btn btn-primary btn-full" type="submit" data-i18n="records.save_document">Save Document</button>
+            </form>
+        </div>
+        <div class="records-list-card">
+            <div class="records-card-header">
+                <div>
+                    <h3 class="sidebar-title" data-i18n="records.saved_documents">Saved Documents</h3>
+                    <p class="records-copy" data-i18n="records.saved_copy">Recent bills and prescriptions stored in your account.</p>
+                </div>
+                <a href="{{ url_for('health.records_page') }}" class="btn btn-secondary" data-i18n="records.view_all">View All</a>
+            </div>
+            {% if documents %}
+            <div class="records-list">
+                {% for doc in documents %}
+                <div class="record-item">
+                    <div>
+                        <div class="record-title-row">
+                            <span class="record-type-badge record-type-{{ doc.document_type }}">{{ doc.document_type }}</span>
+                            <span class="record-title">{{ doc.title }}</span>
+                        </div>
+                        <div class="record-meta">{{ doc.original_filename }} • {{ doc.uploaded_at }}</div>
+                        {% if doc.notes %}
+                        <p class="record-notes">{{ doc.notes }}</p>
+                        {% endif %}
+                        {% if doc.ocr_text %}
+                        <details class="record-ocr">
+                            <summary>OCR Preview{% if doc.ocr_engine %} • {{ doc.ocr_engine }}{% endif %}</summary>
+                            <pre>{{ doc.ocr_text[:1200] }}{% if doc.ocr_text|length > 1200 %}...{% endif %}</pre>
+                        </details>
+                        {% elif doc.ocr_status and doc.ocr_status != 'pending' %}
+                        <p class="record-ocr-muted">OCR status: {{ doc.ocr_status|replace('_', ' ') }}</p>
+                        {% endif %}
+                    </div>
+                    <a class="btn btn-secondary" href="{{ url_for('health.download_record', document_id=doc.id) }}" data-i18n="records.download">Download</a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="dashboard-placeholder records-empty">
+                <div class="placeholder-icon">🗂️</div>
+                <p data-i18n="records.empty">No stored records yet. Upload your first bill or prescription to keep it for future visits.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- ── AI Advisor ── -->
+    <div class="advisor-section" id="advisorSection" style="display:none;">
+        <div class="section-header" style="margin-top:2rem;" data-i18n="dashboard.ai_advisor">🤖 AI Health Advisor</div>
+        <div class="quick-questions">
+            <button class="btn btn-chip" onclick="askAdvisor('Why am I feeling tired?')" data-i18n="dashboard.quick_tired">Why am I tired?</button>
+            <button class="btn btn-chip" onclick="askAdvisor('How can I improve my score?')" data-i18n="dashboard.quick_improve">Improve my score</button>
+            <button class="btn btn-chip" onclick="askAdvisor('What is my weight status?')" data-i18n="dashboard.quick_weight">Weight status</button>
+            <button class="btn btn-chip" onclick="askAdvisor('Give me health tips')" data-i18n="dashboard.quick_tips">Health tips</button>
+        </div>
+        <div class="advisor-chat">
+            <div class="advisor-messages" id="advisorMessages"></div>
+            <div class="chat-input-area">
+                <input type="text" id="advisorInput" placeholder="Ask a health question..." data-i18n-placeholder="dashboard.ask_health_question" onkeydown="if(event.key==='Enter') sendAdvisor()">
+                <button class="chat-send-btn" onclick="sendAdvisor()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Health History Charts ── -->
+    <div class="section-header" id="historyHeader" style="margin-top:2.5rem;" data-i18n="dashboard.history_header">📈 Health History</div>
+    {% if history %}
+    <div class="history-charts-grid">
+        <div class="chart-card">
+            <h3 class="chart-title">🏆 Health Score Over Time</h3>
+            <canvas id="scoreChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">⚖️ BMI Trend</h3>
+            <canvas id="bmiChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">👟 Daily Steps</h3>
+            <canvas id="stepsChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">😴 Sleep Hours</h3>
+            <canvas id="sleepChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">💧 Water Intake (L)</h3>
+            <canvas id="waterChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">❤️ Heart Rate (bpm)</h3>
+            <canvas id="hrChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="section-header" style="margin-top:1.5rem;">📋 Recent Logs</div>
+    <div class="table-container">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Date & Time</th>
+                    <th>BMI</th>
+                    <th>Score</th>
+                    <th>Steps</th>
+                    <th>Sleep</th>
+                    <th>Water</th>
+                    <th>HR</th>
+                    <th>Obesity Risk</th>
+                    <th>Fatigue Risk</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in history %}
+                <tr>
+                    <td class="mono">{{ log.timestamp }}</td>
+                    <td class="mono">{{ "%.1f"|format(log.bmi) }}</td>
+                    <td>
+                        <span class="score-pill {% if log.health_score >= 80 %}pill-green{% elif log.health_score >= 60 %}pill-orange{% else %}pill-red{% endif %}">
+                            {{ log.health_score }}
+                        </span>
+                    </td>
+                    <td class="mono">{{ "{:,}".format(log.steps) }}</td>
+                    <td class="mono">{{ log.sleep }}h</td>
+                    <td class="mono">{{ log.water }}L</td>
+                    <td class="mono">{{ log.heart_rate }}</td>
+                    <td><span class="risk-badge risk-{{ log.obesity_risk|lower }}">{{ log.obesity_risk }}</span></td>
+                    <td><span class="risk-badge risk-{{ log.fatigue_risk|lower }}">{{ log.fatigue_risk }}</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div style="text-align:center; margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="clearLogs()" style="border-color:#ff4757; color:#ff4757;">🗑 Clear All Logs</button>
+    </div>
+
+    {% else %}
+    <div class="dashboard-placeholder" style="margin-top:1rem;">
+        <div class="placeholder-icon">📋</div>
+        <p>No logs yet. Enter your vitals above and click <strong>Save Log</strong> to start recording your health history.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+/* ── History data passed from server ── */
+const historyData = {{ history | tojson }};
+const currentUserData = {};
+const advisorHistory = [];
+
+/* ── Chart.js defaults ── */
+Chart.defaults.color = '#64748b';
+Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+
+function makeLineChart(id, labels, data, label, color, yLabel) {
+    const ctx = document.getElementById(id);
+    if (!ctx) return;
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data,
+                borderColor: color,
+                backgroundColor: color + '18',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: color,
+                pointRadius: 4,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: {
+                    grid: { color: '#1e293b' },
+                    ticks: { maxTicksLimit: 8, maxRotation: 30 }
+                },
+                y: {
+                    grid: { color: '#1e293b' },
+                    title: { display: !!yLabel, text: yLabel }
+                }
+            }
+        }
+    });
+}
+
+if (historyData.length > 0) {
+    const sorted = [...historyData].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+    const labels = sorted.map(r => r.timestamp.substring(5, 16));
+    makeLineChart('scoreChart', labels, sorted.map(r => r.health_score), 'Health Score', '#00e5ff');
+    makeLineChart('bmiChart', labels, sorted.map(r => r.bmi), 'BMI', '#8b5cf6');
+    makeLineChart('stepsChart', labels, sorted.map(r => r.steps), 'Steps', '#00ff88');
+    makeLineChart('sleepChart', labels, sorted.map(r => r.sleep), 'Sleep', '#ffa500');
+    makeLineChart('waterChart', labels, sorted.map(r => r.water), 'Water', '#00e5ff');
+    makeLineChart('hrChart', labels, sorted.map(r => r.heart_rate), 'HR', '#ff4757');
+}
+
+/* ── Gauge canvas ── */
+function drawGauge(canvas, value, color) {
+    const ctx = canvas.getContext('2d');
+    const cx = canvas.width / 2, cy = canvas.height * 0.85;
+    const r = 85;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Background arc
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI, 0);
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 18;
+    ctx.stroke();
+    // Value arc
+    const pct = value / 100;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, Math.PI, Math.PI + pct * Math.PI);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 18;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+    // Label
+    ctx.fillStyle = color;
+    ctx.font = 'bold 28px Space Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(value, cx, cy - 16);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '11px Plus Jakarta Sans';
+    ctx.fillText('Health Score', cx, cy + 6);
+}
+
+/* ── Analyze dashboard ── */
+async function analyzeDashboard() {
+    const body = getFormData();
+    const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (d.error) { alert(d.error); return; }
+    Object.assign(currentUserData, body, d);
+    renderResults(d, body);
+    document.getElementById('advisorSection').style.display = 'block';
+}
+
+function getFormData() {
+    return {
+        gender: document.getElementById('dash-gender').value,
+        age: +document.getElementById('dash-age').value,
+        weight: +document.getElementById('dash-weight').value,
+        height: +document.getElementById('dash-height').value,
+        steps: +document.getElementById('dash-steps').value,
+        sleep: +document.getElementById('dash-sleep').value,
+        water: +document.getElementById('dash-water').value,
+        heart_rate: +document.getElementById('dash-hr').value,
+    };
+}
+
+function renderResults(d, body) {
+    document.getElementById('dashboardPlaceholder').style.display = 'none';
+    document.getElementById('dashboardResults').style.display = 'block';
+
+    const scoreColor = d.health_score >= 80 ? '#00ff88' : d.health_score >= 60 ? '#ffa500' : '#ff4757';
+    document.getElementById('scoreBadge').style.display = 'block';
+    document.getElementById('scoreVal').textContent = d.health_score;
+    document.getElementById('scoreVal').style.color = scoreColor;
+
+    // KPI
+    const kpis = [
+        { label: 'BMI', val: d.bmi, sub: d.bmi_cat, color: d.bmi_color },
+        { label: 'Steps', val: (+body.steps).toLocaleString(), sub: 'Goal: 10,000', color: '#00e5ff' },
+        { label: 'Sleep', val: body.sleep + 'h', sub: 'Rec: 7–9h', color: '#8b5cf6' },
+        { label: 'Hydration', val: body.water + 'L', sub: 'Rec: 2.5L', color: '#00ff88' },
+        { label: 'Heart Rate', val: body.heart_rate, sub: 'bpm resting', color: '#ff6b35' },
+    ];
+    document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+        <div class="metric-card">
+            <div class="metric-label">${k.label}</div>
+            <div class="metric-value" style="color:${k.color}">${k.val}</div>
+            <div class="metric-sub">${k.sub}</div>
+        </div>`).join('');
+
+    // Gauge
+    const gauC = document.getElementById('gaugeCanvas');
+    drawGauge(gauC, d.health_score, scoreColor);
+
+    // Breakdown bars
+    const bars = [
+        { label: 'BMI', pts: d.bmi_pts, max: 25, color: d.bmi_color },
+        { label: 'Sleep', pts: d.sleep_pts, max: 25, color: '#8b5cf6' },
+        { label: 'Steps', pts: d.step_pts, max: 25, color: '#00e5ff' },
+        { label: 'Water', pts: d.water_pts, max: 15, color: '#00ff88' },
+        { label: 'Heart Rate', pts: d.hr_pts, max: 10, color: '#ff6b35' },
+    ];
+    document.getElementById('breakdownBars').innerHTML = bars.map(b => {
+        const pct = Math.round(b.pts / b.max * 100);
+        return `<div class="bar-row">
+            <div class="bar-meta"><span>${b.label}</span><span class="mono" style="color:${b.color}">${b.pts}/${b.max}</span></div>
+            <div class="health-bar-track"><div class="health-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${b.color}88,${b.color})"></div></div>
+        </div>`;
+    }).join('');
+
+    // Risk
+    const risks = [
+        { label: 'Obesity Risk', val: d.obesity_risk, prob: d.ob_prob },
+        { label: 'Fatigue Risk', val: d.fatigue_risk, prob: d.fat_prob },
+        { label: 'Overall Risk', val: d.overall_risk, prob: 100 - d.health_score },
+    ];
+    document.getElementById('riskGrid').innerHTML = risks.map(r => `
+        <div class="metric-card">
+            <div class="metric-label">${r.label}</div>
+            <div style="margin-top:0.5rem;"><span class="risk-badge risk-${r.val.toLowerCase()}">${r.val}</span></div>
+            <div class="metric-sub" style="margin-top:0.5rem;">${Math.round(r.prob)}% probability</div>
+        </div>`).join('');
+}
+
+async function saveLog() {
+    const body = getFormData();
+    const res = await fetch('/api/save_log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    const d = await res.json();
+    if (d.success) {
+        showToast('✅ Health log saved!', 'success');
+        setTimeout(() => location.reload(), 1200);
+    } else {
+        showToast('❌ ' + (d.error || 'Save failed'), 'error');
+    }
+}
+
+async function clearLogs() {
+    if (!confirm('Delete all health logs? This cannot be undone.')) return;
+    await fetch('/api/clear_logs', { method: 'POST' });
+    location.reload();
+}
+
+/* ── AI Advisor ── */
+async function askAdvisor(q) {
+    document.getElementById('advisorInput').value = q;
+    await sendAdvisor();
+}
+
+async function sendAdvisor() {
+    const input = document.getElementById('advisorInput');
+    const q = input.value.trim();
+    if (!q) return;
+    input.value = '';
+    appendMsg('advisorMessages', 'user', q);
+    advisorHistory.push({ role: 'user', content: q });
+    const res = await fetch('/api/advisor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            question: q,
+            user_data: currentUserData,
+            history: advisorHistory
+        })
+    });
+    const d = await res.json();
+    const answer = d.response || d.error || 'Error';
+    appendMsg('advisorMessages', 'ai', answer);
+    advisorHistory.push({ role: 'assistant', content: answer });
+}
+
+function appendMsg(containerId, role, text) {
+    const c = document.getElementById(containerId);
+    const d = document.createElement('div');
+    d.className = role === 'user' ? 'chat-msg-user' : 'chat-msg-ai';
+    const label = document.createElement('div');
+    label.className = 'chat-label';
+    label.textContent = role === 'user' ? 'You' : '🧬 AI Advisor';
+    const bubble = document.createElement('div');
+    bubble.className = 'chat-bubble ' + (role === 'user' ? 'user' : 'assistant');
+    bubble.textContent = text;
+    d.appendChild(label);
+    d.appendChild(bubble);
+    c.appendChild(d);
+    c.scrollTop = c.scrollHeight;
+}
+
+function showToast(msg, type) {
+    const t = document.createElement('div');
+    t.className = 'toast toast-' + type;
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 400); }, 3000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Diabetes Prediction{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header-block">
+        <h1>🩸 Diabetes Risk Prediction</h1>
+        <p>Enter your health metrics to assess diabetes risk</p>
+    </div>
+    <div class="prediction-form-container">
+        <div class="form-card">
+            <form id="diabetesForm" onsubmit="return handlePredict(event, 'diabetes')">
+                <div class="form-grid">
+                    <div class="form-group"><label>🤰 Pregnancies</label><input type="number" name="pregnancies" placeholder="e.g. 6" min="0" required></div>
+                    <div class="form-group"><label>🍬 Glucose</label><input type="number" name="glucose" placeholder="e.g. 148" step="0.1" required></div>
+                    <div class="form-group"><label>💉 Blood Pressure</label><input type="number" name="blood_pressure" placeholder="e.g. 72" step="0.1" required></div>
+                    <div class="form-group"><label>📏 Skin Thickness</label><input type="number" name="skin_thickness" placeholder="e.g. 35" step="0.1" required></div>
+                    <div class="form-group"><label>💊 Insulin</label><input type="number" name="insulin" placeholder="e.g. 0" step="0.1" required></div>
+                    <div class="form-group"><label>⚖️ BMI</label><input type="number" name="bmi" placeholder="e.g. 33.6" step="0.1" required></div>
+                    <div class="form-group"><label>🧬 Diabetes Pedigree</label><input type="number" name="diabetes_pedigree_function" placeholder="e.g. 0.627" step="0.001" required></div>
+                    <div class="form-group"><label>🎂 Age</label><input type="number" name="age" placeholder="e.g. 50" min="0" required></div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit">🔍 Predict Diabetes Risk</button>
+            </form>
+            <div class="result-container" id="result-diabetes"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}<script src="{{ url_for('static', filename='js/predict.js') }}"></script>{% endblock %}

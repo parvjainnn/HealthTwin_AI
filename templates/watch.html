@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Smartwatch{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="section-header-block">
+        <h1>⌚ Smart Watch Simulation</h1>
+        <p>Live simulated readings from your digital health twin</p>
+    </div>
+    <div class="watch-live-indicator">
+        <span class="pulse-dot"></span>
+        <span class="watch-live-text">Live Simulation Active</span>
+    </div>
+    <div class="watch-grid" id="watchGrid">
+        <div class="watch-card"><div class="watch-icon">❤️</div><div class="watch-label">Heart Rate</div><div class="watch-value" id="wr-hr" style="color:#ff4757;">--</div><div class="watch-unit">bpm</div></div>
+        <div class="watch-card"><div class="watch-icon">🫁</div><div class="watch-label">SpO₂</div><div class="watch-value" id="wr-spo2" style="color:#00e5ff;">--</div><div class="watch-unit">%</div></div>
+        <div class="watch-card"><div class="watch-icon">🧠</div><div class="watch-label">Stress</div><div class="watch-value" id="wr-stress" style="color:#8b5cf6;">--</div><div class="watch-unit">/100</div></div>
+        <div class="watch-card"><div class="watch-icon">👟</div><div class="watch-label">Live Steps</div><div class="watch-value" id="wr-steps" style="color:#00ff88;">--</div><div class="watch-unit">today</div></div>
+        <div class="watch-card"><div class="watch-icon">🔥</div><div class="watch-label">Calories</div><div class="watch-value" id="wr-cal" style="color:#ff6b35;">--</div><div class="watch-unit">kcal</div></div>
+    </div>
+    <div class="watch-chart-section">
+        <h3 class="chart-title">Heart Rate — Last 30 Readings</h3>
+        <canvas id="hrChart" height="120"></canvas>
+    </div>
+    <div style="text-align:center; margin-top:1.5rem;">
+        <button class="btn btn-primary" onclick="refreshWatch()">⌚ Refresh Watch Data</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+let hrChartInst = null;
+async function refreshWatch() {
+    const res = await fetch('/api/watch');
+    const d = await res.json();
+    document.getElementById('wr-hr').textContent = d.heart_rate;
+    document.getElementById('wr-spo2').textContent = d.spo2;
+    document.getElementById('wr-stress').textContent = d.stress;
+    document.getElementById('wr-steps').textContent = d.live_steps.toLocaleString();
+    document.getElementById('wr-cal').textContent = d.calories.toLocaleString();
+    const labels = d.hr_series.map((_, i) => i + 1);
+    if (hrChartInst) { hrChartInst.destroy(); }
+    Chart.defaults.color = '#64748b';
+    hrChartInst = new Chart(document.getElementById('hrChart'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Heart Rate',
+                data: d.hr_series,
+                borderColor: '#ff4757',
+                backgroundColor: 'rgba(255,71,87,0.08)',
+                fill: true, tension: 0.4, pointRadius: 3, borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: '#1e293b' }, ticks: { display: false } },
+                y: { grid: { color: '#1e293b' } }
+            }
+        }
+    });
+}
+refreshWatch();
+</script>
+{% endblock %}

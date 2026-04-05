@@ -1,0 +1,88 @@
+# Medical Chatbot Integration into Flask App
+
+## Overview
+
+The `medical-chatbot` reference uses:
+- **FAISS vectorstore** (already built at `medical-chatbot/vectorstore/db_faiss/`) with the Gale Encyclopedia of Medicine PDF embedded via `sentence-transformers/all-MiniLM-L6-v2`
+- **Groq LLM** (`llama-3.1-8b-instant`) for generation
+- **LangChain RAG chain** (retriever → stuff-docs → LLM)
+- The GROQ_API_KEY is already present in the root `.env`
+
+We will replace the current rule-based chatbot with a full **RAG-powered medical chatbot** + **mental health detection** layer, all wired into the existing Flask app.
+
+---
+
+## Proposed Changes
+
+### 1. Flask Backend — Chatbot Module
+
+#### [MODIFY] [chatbot.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/flask_app/chatbot.py)
+- Add a `load_rag_chain()` cached function that loads the FAISS vectorstore and builds a LangChain RAG chain (no `hub.pull`, use inline `PromptTemplate`)
+- Add mental health detection: scan user message for distress signals; if detected, prepend a supportive header and route to a mental-health-specific prompt
+- Return structured JSON: `{ response, mental_health_alert, sources }`
+
+#### [NEW] `flask_app/rag_chatbot.py`
+- Standalone module: `get_rag_chain()` — loads FAISS, creates Groq LLM, builds RAG chain with a custom medical prompt template (avoiding `hub.pull`)
+- `detect_mental_health(message)` — keyword + sentiment heuristic returning a dict `{ detected: bool, category: str, severity: low/medium/high }`
+
+---
+
+### 2. Frontend Template
+
+#### [MODIFY] [chatbot.html](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/templates/chatbot.html)
+Complete redesign:
+- Two-panel layout: chat on left, quick-access mental health resources panel on right
+- Markdown rendering for bot responses (convert `**bold**`, `*italic*`, bullet lists)
+- Mental health alert banner shown dynamically when detected (with crisis hotline info)
+- Source citation drawer (collapsible) showing which medical documents answered the question
+- Suggested quick-question chips (pre-built prompts like "What are symptoms of diabetes?", "I feel anxious all the time")
+- Typing animation (animated dots)
+- Dark glassmorphism design consistent with existing app aesthetic
+
+---
+
+### 3. RAG Prompt Design
+
+Custom system prompt (no `hub.pull`):
+```
+You are MediBot, an expert AI medical assistant integrated in the HealthTwin platform.
+Use the following medical context to answer the question accurately and concisely.
+If the question is about mental health or emotional distress, respond with empathy first, then medical information.
+Always recommend consulting a qualified healthcare professional for diagnosis or treatment.
+
+Context: {context}
+
+Question: {input}
+
+Answer:
+```
+
+---
+
+### 4. Mental Health Detection
+
+Keywords/phrases detected (with severity):
+- **High**: suicide, self-harm, kill myself, end my life, hopeless, can't go on
+- **Medium**: depressed, anxious, panic attack, can't sleep, overwhelming sadness, breakdown
+- **Low**: stressed, worried, sad, feeling down, lonely, burnt out
+
+When detected:
+- Response always starts with empathy message
+- Alert banner shows resources: iCall (9152987821), Vandrevala Foundation (1860-2662-345)
+- Mental health prompt variant used that prioritizes emotional support + medical info
+
+---
+
+## Verification Plan
+
+1. Run `pip install langchain langchain-groq langchain-community langchain-huggingface faiss-cpu sentence-transformers` in venv
+2. Start Flask with `python run.py` 
+3. Navigate to `/chatbot`, ask: "What are the symptoms of diabetes?"
+4. Ask: "I feel so depressed and hopeless lately" → verify mental health banner appears
+5. Check source citations appear in the drawer
+
+> [!IMPORTANT]
+> The vectorstore already exists at `medical-chatbot/vectorstore/db_faiss/`. We'll reference it using an absolute path relative to the project root.
+
+> [!NOTE]
+> We avoid `hub.pull()` entirely (requires LangSmith API key). Instead we define the prompt template inline.

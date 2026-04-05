@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Medical Records{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="hero-title" data-i18n="records.page_title">🧾 Medical Records</h1>
+            <p class="hero-subtitle" data-i18n="records.page_subtitle">Bills and doctor prescriptions stored securely for your future visits.</p>
+        </div>
+        <a href="{{ url_for('health.dashboard') }}" class="btn btn-secondary" data-i18n="history.back">← Back to Dashboard</a>
+    </div>
+
+    {% if documents %}
+    <div class="records-list-card">
+        <div class="records-list">
+            {% for doc in documents %}
+            <div class="record-item">
+                <div>
+                    <div class="record-title-row">
+                        <span class="record-type-badge record-type-{{ doc.document_type }}">{{ doc.document_type }}</span>
+                        <span class="record-title">{{ doc.title }}</span>
+                    </div>
+                    <div class="record-meta">{{ doc.original_filename }} • {{ doc.uploaded_at }}</div>
+                    {% if doc.notes %}
+                    <p class="record-notes">{{ doc.notes }}</p>
+                    {% endif %}
+                    {% if doc.ocr_text %}
+                    <details class="record-ocr">
+                        <summary data-i18n="records.ocr_preview">OCR Preview</summary>
+                        <pre>{{ doc.ocr_text[:1200] }}{% if doc.ocr_text|length > 1200 %}...{% endif %}</pre>
+                    </details>
+                    {% elif doc.ocr_status and doc.ocr_status != 'pending' %}
+                    <p class="record-ocr-muted">OCR status: {{ doc.ocr_status|replace('_', ' ') }}</p>
+                    {% endif %}
+                </div>
+                    <a class="btn btn-secondary" href="{{ url_for('health.download_record', document_id=doc.id) }}" data-i18n="records.download">Download</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="dashboard-placeholder records-empty">
+        <div class="placeholder-icon">🗂️</div>
+        <p data-i18n="records.page_empty">No documents saved yet. Use the dashboard upload section to add bills and prescriptions for future reference.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

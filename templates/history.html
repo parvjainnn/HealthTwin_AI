@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+{% block title %}Full Health History{% endblock %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<style>
+:root {
+    --history-kpi-score: #1e7d5b;
+    --history-kpi-best: #2f9f74;
+    --history-kpi-low: #c84e5d;
+    --history-kpi-total: #6a8fbe;
+    --history-row-index: #557160;
+    --history-chart-grid: rgba(68, 126, 94, 0.16);
+    --history-chart-ticks: #5f8270;
+}
+
+.dark-theme {
+    --history-kpi-score: #00e5ff;
+    --history-kpi-best: #00ff88;
+    --history-kpi-low: #ff4757;
+    --history-kpi-total: #8b5cf6;
+    --history-row-index: #64748b;
+    --history-chart-grid: #1e293b;
+    --history-chart-ticks: #64748b;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 class="hero-title" data-i18n="history.title">📈 Health History</h1>
+            <p class="hero-subtitle"><span data-i18n="history.subtitle_prefix">Your complete wellness journey</span> - {{ history|length }} <span data-i18n="history.subtitle_suffix">total records</span></p>
+        </div>
+        <a href="{{ url_for('health.dashboard') }}" class="btn btn-secondary" data-i18n="history.back">← Back to Dashboard</a>
+    </div>
+
+    {% if history %}
+    <!-- Charts -->
+    <div class="history-charts-grid">
+        <div class="chart-card">
+            <h3 class="chart-title">🏆 Health Score</h3>
+            <canvas id="scoreChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">⚖️ BMI Trend</h3>
+            <canvas id="bmiChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">👟 Daily Steps</h3>
+            <canvas id="stepsChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">😴 Sleep Hours</h3>
+            <canvas id="sleepChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">💧 Water Intake</h3>
+            <canvas id="waterChart" height="120"></canvas>
+        </div>
+        <div class="chart-card">
+            <h3 class="chart-title">❤️ Heart Rate</h3>
+            <canvas id="hrChart" height="120"></canvas>
+        </div>
+    </div>
+
+    <!-- Summary stats -->
+    <div class="section-header" style="margin-top:2rem;" data-i18n="history.statistics">📊 Statistics Summary</div>
+    {% set scores = history | map(attribute='health_score') | list %}
+    {% set avg_score = (scores | sum / scores | length) | round(1) %}
+    {% set max_score = scores | max %}
+    {% set min_score = scores | min %}
+    <div class="kpi-grid">
+        <div class="metric-card">
+            <div class="metric-label">Average Score</div>
+            <div class="metric-value" style="color:var(--history-kpi-score);">{{ avg_score }}</div>
+            <div class="metric-sub">out of 100</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Best Score</div>
+            <div class="metric-value" style="color:var(--history-kpi-best);">{{ max_score }}</div>
+            <div class="metric-sub">peak performance</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Lowest Score</div>
+            <div class="metric-value" style="color:var(--history-kpi-low);">{{ min_score }}</div>
+            <div class="metric-sub">needs attention</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Total Logs</div>
+            <div class="metric-value" style="color:var(--history-kpi-total);">{{ history|length }}</div>
+            <div class="metric-sub">health records</div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="section-header" style="margin-top:2rem;" data-i18n="history.all_records">📋 All Records</div>
+    <div class="table-container">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>#</th><th>Date & Time</th><th>Age</th><th>BMI</th><th>Score</th>
+                    <th>Steps</th><th>Sleep</th><th>Water</th><th>HR</th>
+                    <th>Obesity Risk</th><th>Fatigue Risk</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for log in history %}
+                <tr>
+                    <td class="mono" style="color:var(--history-row-index);">{{ loop.index }}</td>
+                    <td class="mono">{{ log.timestamp }}</td>
+                    <td class="mono">{{ log.age }}</td>
+                    <td class="mono">{{ "%.1f"|format(log.bmi) }}</td>
+                    <td>
+                        <span class="score-pill {% if log.health_score >= 80 %}pill-green{% elif log.health_score >= 60 %}pill-orange{% else %}pill-red{% endif %}">
+                            {{ log.health_score }}
+                        </span>
+                    </td>
+                    <td class="mono">{{ "{:,}".format(log.steps) }}</td>
+                    <td class="mono">{{ log.sleep }}h</td>
+                    <td class="mono">{{ log.water }}L</td>
+                    <td class="mono">{{ log.heart_rate }}</td>
+                    <td><span class="risk-badge risk-{{ log.obesity_risk|lower }}">{{ log.obesity_risk }}</span></td>
+                    <td><span class="risk-badge risk-{{ log.fatigue_risk|lower }}">{{ log.fatigue_risk }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div style="text-align:center; margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="clearLogs()" style="border-color:#ff4757;color:#ff4757;">🗑 Clear All Logs</button>
+    </div>
+    {% else %}
+    <div class="dashboard-placeholder">
+        <div class="placeholder-icon">📋</div>
+        <p><span data-i18n="history.empty_prefix">No health history yet.</span> <a href="{{ url_for('health.dashboard') }}" data-i18n="history.empty_link">Go to the Dashboard</a> <span data-i18n="history.empty_suffix">to save your first log.</span></p>
+    </div>
+    {% endif %}
+
+    <div class="section-header" style="margin-top:2.5rem;" data-i18n="records.saved_bills">🧾 Saved Bills & Prescriptions</div>
+    {% if documents %}
+    <div class="records-list-card">
+        <div class="records-list">
+            {% for doc in documents %}
+            <div class="record-item">
+                <div>
+                    <div class="record-title-row">
+                        <span class="record-type-badge record-type-{{ doc.document_type }}">{{ doc.document_type }}</span>
+                        <span class="record-title">{{ doc.title }}</span>
+                    </div>
+                    <div class="record-meta">{{ doc.original_filename }} • {{ doc.uploaded_at }}</div>
+                    {% if doc.notes %}
+                    <p class="record-notes">{{ doc.notes }}</p>
+                    {% endif %}
+                    {% if doc.ocr_text %}
+                    <details class="record-ocr">
+                        <summary>OCR Preview{% if doc.ocr_engine %} • {{ doc.ocr_engine }}{% endif %}</summary>
+                        <pre>{{ doc.ocr_text[:1200] }}{% if doc.ocr_text|length > 1200 %}...{% endif %}</pre>
+                    </details>
+                    {% elif doc.ocr_status and doc.ocr_status != 'pending' %}
+                    <p class="record-ocr-muted">OCR status: {{ doc.ocr_status|replace('_', ' ') }}</p>
+                    {% endif %}
+                </div>
+                <a class="btn btn-secondary" href="{{ url_for('health.download_record', document_id=doc.id) }}" data-i18n="records.download">Download</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="dashboard-placeholder records-empty">
+        <div class="placeholder-icon">🧾</div>
+        <p><span data-i18n="records.empty_history_prefix">No saved bills or prescriptions yet.</span> <a href="{{ url_for('health.dashboard') }}" data-i18n="records.empty_history_link">dashboard</a>.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+const chartTheme = getComputedStyle(document.documentElement);
+Chart.defaults.color = chartTheme.getPropertyValue('--history-chart-ticks').trim();
+const historyData = {{ history | tojson }};
+if (historyData.length > 0) {
+    const sorted = [...historyData].sort((a,b) => a.timestamp.localeCompare(b.timestamp));
+    const labels = sorted.map(r => r.timestamp.substring(5, 16));
+    function mkChart(id, data, color, label) {
+        const ctx = document.getElementById(id);
+        if (!ctx) return;
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{ label, data, borderColor: color, backgroundColor: color + '18',
+                    fill: true, tension: 0.4, pointRadius: 4, borderWidth: 2 }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: chartTheme.getPropertyValue('--history-chart-grid').trim() }, ticks: { maxTicksLimit: 10, maxRotation: 30 } },
+                    y: { grid: { color: chartTheme.getPropertyValue('--history-chart-grid').trim() } }
+                }
+            }
+        });
+    }
+    mkChart('scoreChart', sorted.map(r => r.health_score), '#00e5ff', 'Health Score');
+    mkChart('bmiChart', sorted.map(r => r.bmi), '#8b5cf6', 'BMI');
+    mkChart('stepsChart', sorted.map(r => r.steps), '#00ff88', 'Steps');
+    mkChart('sleepChart', sorted.map(r => r.sleep), '#ffa500', 'Sleep');
+    mkChart('waterChart', sorted.map(r => r.water), '#00e5ff', 'Water');
+    mkChart('hrChart', sorted.map(r => r.heart_rate), '#ff4757', 'HR');
+}
+async function clearLogs() {
+    if (!confirm('Delete all health logs?')) return;
+    await fetch('/api/clear_logs', { method: 'POST' });
+    location.href = '{{ url_for("health.history_page") }}';
+}
+</script>
+{% endblock %}

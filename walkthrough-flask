@@ -1,0 +1,94 @@
+# HealthTwin Flask App — Walkthrough
+
+## What Was Built
+
+Recreated the entire HealthTwin application in Flask with a comprehensive health history dashboard and user login system.
+
+## Project Structure
+
+```
+healthtwin/
+├── flask_app/
+│   ├── __init__.py          # Flask factory + blueprint registration
+│   ├── user_model.py        # Flask-Login UserMixin
+│   ├── database.py          # SQLite helpers (users + health_logs)
+│   ├── auth.py              # Login / Register / Logout blueprint
+│   ├── health.py            # Dashboard, analyze, save_log, history, AI advisor
+│   ├── predictions.py       # Diabetes / Heart / Parkinson's prediction routes
+│   ├── chatbot.py           # AI chatbot blueprint
+│   ├── ml_models.py         # Risk classifiers + health score + disease models
+│   └── ai_advisor.py        # Rule-based health advisor
+├── templates/
+│   ├── base.html            # Layout with navigation (auth-aware)
+│   ├── login.html           # Login page with password toggle
+│   ├── register.html        # Registration page
+│   ├── index.html           # Landing page
+│   ├── dashboard.html       # ⭐ Main dashboard (Charts.js history charts + AI advisor)
+│   ├── history.html         # ⭐ Full history page with 6 charts + stats
+│   ├── diabetes.html        # Diabetes prediction form
+│   ├── heart.html           # Heart disease prediction form
+│   ├── parkinsons.html      # Parkinson's prediction form
+│   ├── watch.html           # Smartwatch simulation
+│   └── chatbot.html         # AI chat interface
+├── static_flask/
+│   ├── css/styles.css       # Premium dark UI with glassmorphism + animations
+│   └── js/
+│       ├── app.js           # Flash message auto-dismiss
+│       └── predict.js       # Shared prediction form handler
+└── run.py                   # Entry point → python run.py
+```
+
+## How to Run
+
+```powershell
+cd c:\Users\ASUS\Documents\WebD\HackathonProject\healthtwin
+.\venv\Scripts\python run.py
+```
+
+Then open **http://localhost:5000** in your browser.
+
+## Dashboard Health History Features
+
+The dashboard page (`/dashboard`) and history page (`/history`) show **6 interactive Chart.js charts**:
+
+| Chart | Metric |
+|-------|--------|
+| 🏆 Health Score | Your overall score over time |
+| ⚖️ BMI | BMI trend over time |
+| 👟 Daily Steps | Step count history |
+| 😴 Sleep Hours | Sleep pattern tracking |
+| 💧 Water Intake | Hydration history |
+| ❤️ Heart Rate | Resting heart rate trend |
+
+## Pages & Routes
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing page |
+| `/login` | Login (username + password) |
+| `/register` | Create new account |
+| `/dashboard` | Main health dashboard + charts + AI advisor |
+| `/history` | Full history page with charts + stats summary |
+| `/diabetes` | Diabetes risk prediction |
+| `/heart` | Heart disease detection |
+| `/parkinsons` | Parkinson's analysis |
+| `/watch` | Smartwatch simulation |
+| `/chatbot` | AI health chat assistant |
+| `/logout` | Logout |
+
+## Verified Working
+
+- ✅ Home page: http://127.0.0.1:5000/ — loads with all feature cards
+- ✅ Login page: http://127.0.0.1:5000/login — form renders correctly
+- ✅ Register page: http://127.0.0.1:5000/register — form renders correctly
+- ✅ Flask server running on port 5000 serving all routes
+- ✅ Flask-Login authentication with session management
+- ✅ SQLite database with per-user health logs
+- ✅ ML risk models (obesity + fatigue) via RandomForest
+- ✅ AI health advisor rule-based system
+
+## New Database
+
+A new SQLite DB **`healthtwin_flask.db`** is created automatically with:
+- `users` table — username, email, hashed password
+- `health_logs` table — per-user timestamped health records

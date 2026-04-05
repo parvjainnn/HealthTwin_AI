@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="HealthTwin — AI-Powered Health Prediction & Medical Assistant. Predict diabetes, heart disease, and Parkinson's with machine learning.">
+    <title>HealthTwin — AI Health Prediction</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <!-- ═══ Navigation ═══ -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="#" class="logo" onclick="navigate('home')">
+                <span class="logo-icon">🧬</span>
+                <span>HealthTwin</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#" data-page="home" class="active" onclick="navigate('home')">Home</a></li>
+                <li><a href="#" data-page="dashboard" onclick="navigate('dashboard')">📊 Dashboard</a></li>
+                <li><a href="#" data-page="diabetes" onclick="navigate('diabetes')">🩸 Diabetes</a></li>
+                <li><a href="#" data-page="heart" onclick="navigate('heart')">❤️ Heart</a></li>
+                <li><a href="#" data-page="parkinsons" onclick="navigate('parkinsons')">🧠 Parkinson's</a></li>
+                <li><a href="#" data-page="watch" onclick="navigate('watch')">⌚ Watch</a></li>
+                <li><a href="#" data-page="history" onclick="navigate('history')">📈 History</a></li>
+                <li><a href="#" data-page="chatbot" onclick="navigate('chatbot')">💬 AI Chat</a></li>
+            </ul>
+            <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileMenu()">☰</button>
+        </div>
+    </nav>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- ─── HOME ─── -->
+            <section class="page-section active" id="page-home">
+                <div class="hero">
+                    <div class="hero-badge">🔬 AI-Powered Health Platform</div>
+                    <h1>Your Digital<br><span class="gradient-text">Health Twin</span></h1>
+                    <p>Advanced machine learning models to predict health risks and an AI medical assistant — all in one platform.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="navigate('dashboard')">📊 Health Dashboard</button>
+                        <button class="btn btn-secondary" onclick="navigate('diabetes')">🩺 Start Prediction</button>
+                        <button class="btn btn-secondary" onclick="navigate('chatbot')">💬 Ask AI Assistant</button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">3</div>
+                        <div class="stat-label">Disease Models</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">AI</div>
+                        <div class="stat-label">Powered Chatbot</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">📊</div>
+                        <div class="stat-label">Health Dashboard</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">24/7</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card" onclick="navigate('dashboard')">
+                        <div class="feature-icon">📊</div>
+                        <h3>Health Dashboard</h3>
+                        <p>Track your vitals, get your health score, risk analysis, and personalized AI health advice.</p>
+                    </div>
+                    <div class="feature-card" onclick="navigate('diabetes')">
+                        <div class="feature-icon">🩸</div>
+                        <h3>Diabetes Prediction</h3>
+                        <p>Assess diabetes risk using glucose levels, BMI, age, and more with our trained ML model.</p>
+                    </div>
+                    <div class="feature-card" onclick="navigate('heart')">
+                        <div class="feature-icon">❤️</div>
+                        <h3>Heart Disease Detection</h3>
+                        <p>Evaluate heart disease risk based on blood pressure, cholesterol, ECG results, and other vitals.</p>
+                    </div>
+                    <div class="feature-card" onclick="navigate('parkinsons')">
+                        <div class="feature-icon">🧠</div>
+                        <h3>Parkinson's Analysis</h3>
+                        <p>Detect Parkinson's disease indicators through voice frequency and amplitude measurements.</p>
+                    </div>
+                    <div class="feature-card" onclick="navigate('watch')">
+                        <div class="feature-icon">⌚</div>
+                        <h3>Smart Watch</h3>
+                        <p>Simulated smartwatch readings for heart rate, SpO₂, stress levels, and daily activity.</p>
+                    </div>
+                    <div class="feature-card" onclick="navigate('chatbot')">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI Medical Assistant</h3>
+                        <p>Chat with our AI-powered health assistant for medical information and health guidance.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── DASHBOARD ─── -->
+            <section class="page-section" id="page-dashboard">
+                <div class="section-header">
+                    <h2>📊 Health Dashboard</h2>
+                    <p>Enter your vitals to compute health score, risk analysis & receive AI advice</p>
+                </div>
+
+                <div class="dashboard-layout">
+                    <!-- Vitals Form -->
+                    <div class="dashboard-sidebar">
+                        <div class="form-card">
+                            <h3 class="sidebar-title">👤 Your Vitals</h3>
+                            <div class="dashboard-form-grid">
+                                <div class="form-group">
+                                    <label>Name</label>
+                                    <input type="text" id="dash-name" value="Alex" placeholder="Your name">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select id="dash-gender">
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Age</label>
+                                    <input type="number" id="dash-age" value="28" min="10" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label>Weight (kg)</label>
+                                    <input type="number" id="dash-weight" value="72" min="30" max="200" step="0.5">
+                                </div>
+                                <div class="form-group">
+                                    <label>Height (cm)</label>
+                                    <input type="number" id="dash-height" value="175" min="100" max="220">
+                                </div>
+                                <div class="form-group">
+                                    <label>Daily Steps</label>
+                                    <input type="number" id="dash-steps" value="6500" min="0" max="50000" step="500">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sleep (hours)</label>
+                                    <input type="number" id="dash-sleep" value="6.5" min="0" max="12" step="0.5">
+                                </div>
+                                <div class="form-group">
+                                    <label>Water (litres)</label>
+                                    <input type="number" id="dash-water" value="2.0" min="0" max="10" step="0.25">
+                                </div>
+                                <div class="form-group">
+                                    <label>Heart Rate (bpm)</label>
+                                    <input type="number" id="dash-hr" value="72" min="30" max="220">
+                                </div>
+                            </div>
+                            <div class="dashboard-actions">
+                                <button class="btn btn-primary btn-submit" onclick="analyzeDashboard()">🔍 Analyze</button>
+                                <button class="btn btn-secondary btn-submit" onclick="saveHealthLog()">💾 Save Log</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Area -->
+                    <div class="dashboard-main" id="dashboardResults">
+                        <div class="dashboard-placeholder">
+                            <div class="placeholder-icon">📊</div>
+                            <p>Enter your vitals and click <strong>Analyze</strong> to see your health dashboard</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Advisor Section -->
+                <div class="advisor-section" id="advisorSection" style="display:none;">
+                    <div class="section-header" style="margin-top:2rem;">
+                        <h2>🤖 AI Health Advisor</h2>
+                        <p>Ask health questions — I analyze your personal data to give tailored advice</p>
+                    </div>
+                    <div class="advisor-quick-questions">
+                        <button class="btn btn-secondary" onclick="sendAdvisorQuick('Why am I feeling tired?')">Why am I tired?</button>
+                        <button class="btn btn-secondary" onclick="sendAdvisorQuick('How can I improve my score?')">Improve my score</button>
+                        <button class="btn btn-secondary" onclick="sendAdvisorQuick('What is my weight status?')">Weight status</button>
+                        <button class="btn btn-secondary" onclick="sendAdvisorQuick('Give me health tips')">Health tips</button>
+                    </div>
+                    <div class="advisor-chat-container">
+                        <div class="advisor-messages" id="advisorMessages"></div>
+                        <div class="chat-input-area">
+                            <input type="text" id="advisorInput" placeholder="Ask a health question..." onkeydown="if(event.key==='Enter') sendAdvisorChat()">
+                            <button class="chat-send-btn" onclick="sendAdvisorChat()">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── DIABETES ─── -->
+            <section class="page-section" id="page-diabetes">
+                <div class="section-header">
+                    <h2>🩸 Diabetes Risk Prediction</h2>
+                    <p>Enter your health metrics to assess diabetes risk</p>
+                </div>
+                <div class="prediction-form-container">
+                    <div class="form-card">
+                        <form id="diabetesForm" onsubmit="return handlePrediction(event, 'diabetes')">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label><span class="label-icon">🤰</span> Pregnancies</label>
+                                    <input type="number" name="pregnancies" placeholder="e.g. 6" step="1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🍬</span> Glucose</label>
+                                    <input type="number" name="glucose" placeholder="e.g. 148" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">💉</span> Blood Pressure</label>
+                                    <input type="number" name="blood_pressure" placeholder="e.g. 72" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">📏</span> Skin Thickness</label>
+                                    <input type="number" name="skin_thickness" placeholder="e.g. 35" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">💊</span> Insulin</label>
+                                    <input type="number" name="insulin" placeholder="e.g. 0" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">⚖️</span> BMI</label>
+                                    <input type="number" name="bmi" placeholder="e.g. 33.6" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🧬</span> Diabetes Pedigree</label>
+                                    <input type="number" name="diabetes_pedigree_function" placeholder="e.g. 0.627" step="0.001" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🎂</span> Age</label>
+                                    <input type="number" name="age" placeholder="e.g. 50" step="1" min="0" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-submit">🔍 Predict Diabetes Risk</button>
+                        </form>
+                        <div class="spinner" id="spinner-diabetes"><div class="spinner-ring"></div></div>
+                        <div class="result-container" id="result-diabetes"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── HEART DISEASE ─── -->
+            <section class="page-section" id="page-heart">
+                <div class="section-header">
+                    <h2>❤️ Heart Disease Detection</h2>
+                    <p>Provide your cardiovascular metrics for analysis</p>
+                </div>
+                <div class="prediction-form-container">
+                    <div class="form-card">
+                        <form id="heartForm" onsubmit="return handlePrediction(event, 'heart')">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label><span class="label-icon">🎂</span> Age</label>
+                                    <input type="number" name="age" placeholder="e.g. 55" step="1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">👤</span> Sex</label>
+                                    <select name="sex" required>
+                                        <option value="">Select...</option>
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">💔</span> Chest Pain Type</label>
+                                    <select name="chest_pain_type" required>
+                                        <option value="">Select...</option>
+                                        <option value="0">Typical Angina</option>
+                                        <option value="1">Atypical Angina</option>
+                                        <option value="2">Non-Anginal</option>
+                                        <option value="3">Asymptomatic</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">💉</span> Resting BP</label>
+                                    <input type="number" name="resting_bp" placeholder="e.g. 140" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🧪</span> Cholesterol</label>
+                                    <input type="number" name="cholesterol" placeholder="e.g. 289" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🍬</span> Fasting Blood Sugar &gt;120</label>
+                                    <select name="fasting_bs" required>
+                                        <option value="">Select...</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">📊</span> Resting ECG</label>
+                                    <select name="resting_ecg" required>
+                                        <option value="">Select...</option>
+                                        <option value="0">Normal</option>
+                                        <option value="1">ST-T Abnormality</option>
+                                        <option value="2">LV Hypertrophy</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">💓</span> Max Heart Rate</label>
+                                    <input type="number" name="max_hr" placeholder="e.g. 172" step="0.1" min="0" required>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">🏃</span> Exercise Angina</label>
+                                    <select name="exercise_angina" required>
+                                        <option value="">Select...</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label><span class="label-icon">📉</span> Oldpeak (ST Depression)</label>
+                                    <input type="number" name="oldpeak" placeholder="e.g. 0" step="0.1" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-submit">🔍 Detect Heart Disease</button>
+                        </form>
+                        <div class="spinner" id="spinner-heart"><div class="spinner-ring"></div></div>
+                        <div class="result-container" id="result-heart"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── PARKINSON'S ─── -->
+            <section class="page-section" id="page-parkinsons">
+                <div class="section-header">
+                    <h2>🧠 Parkinson's Disease Analysis</h2>
+                    <p>Enter voice measurement data for analysis</p>
+                </div>
+                <div class="prediction-form-container">
+                    <div class="form-card">
+                        <form id="parkinsonsForm" onsubmit="return handlePrediction(event, 'parkinsons')">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>MDVP:Fo(Hz)</label>
+                                    <input type="number" name="fo" placeholder="e.g. 119.99" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Fhi(Hz)</label>
+                                    <input type="number" name="fhi" placeholder="e.g. 157.30" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Flo(Hz)</label>
+                                    <input type="number" name="flo" placeholder="e.g. 74.99" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Jitter(%)</label>
+                                    <input type="number" name="jitter_percent" placeholder="e.g. 0.00784" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Jitter(Abs)</label>
+                                    <input type="number" name="jitter_abs" placeholder="e.g. 0.00007" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:RAP</label>
+                                    <input type="number" name="rap" placeholder="e.g. 0.0037" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:PPQ</label>
+                                    <input type="number" name="ppq" placeholder="e.g. 0.00554" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Jitter:DDP</label>
+                                    <input type="number" name="ddp" placeholder="e.g. 0.01109" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Shimmer</label>
+                                    <input type="number" name="shimmer" placeholder="e.g. 0.04374" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:Shimmer(dB)</label>
+                                    <input type="number" name="shimmer_db" placeholder="e.g. 0.426" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Shimmer:APQ3</label>
+                                    <input type="number" name="apq3" placeholder="e.g. 0.02182" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Shimmer:APQ5</label>
+                                    <input type="number" name="apq5" placeholder="e.g. 0.0313" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>MDVP:APQ</label>
+                                    <input type="number" name="apq" placeholder="e.g. 0.02971" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Shimmer:DDA</label>
+                                    <input type="number" name="dda" placeholder="e.g. 0.06545" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>NHR</label>
+                                    <input type="number" name="nhr" placeholder="e.g. 0.02211" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>HNR</label>
+                                    <input type="number" name="hnr" placeholder="e.g. 21.033" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>RPDE</label>
+                                    <input type="number" name="rpde" placeholder="e.g. 0.414783" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>DFA</label>
+                                    <input type="number" name="dfa" placeholder="e.g. 0.815285" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>spread1</label>
+                                    <input type="number" name="spread1" placeholder="e.g. -4.813031" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>spread2</label>
+                                    <input type="number" name="spread2" placeholder="e.g. 0.266482" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>D2</label>
+                                    <input type="number" name="d2" placeholder="e.g. 2.301442" step="any" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>PPE</label>
+                                    <input type="number" name="ppe" placeholder="e.g. 0.284654" step="any" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-submit">🔍 Analyze Parkinson's</button>
+                        </form>
+                        <div class="spinner" id="spinner-parkinsons"><div class="spinner-ring"></div></div>
+                        <div class="result-container" id="result-parkinsons"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── SMART WATCH ─── -->
+            <section class="page-section" id="page-watch">
+                <div class="section-header">
+                    <h2>⌚ Smart Watch Simulation</h2>
+                    <p>Simulated live smartwatch readings from your digital health twin</p>
+                </div>
+                <div class="watch-live-indicator">
+                    <span class="pulse-dot"></span>
+                    <span class="watch-live-text">Live Simulation</span>
+                </div>
+                <div class="watch-grid" id="watchGrid">
+                    <div class="watch-card" id="watch-hr">
+                        <div class="watch-icon">❤️</div>
+                        <div class="watch-label">Heart Rate</div>
+                        <div class="watch-value" style="color:#ff4757;">--</div>
+                        <div class="watch-unit">bpm</div>
+                    </div>
+                    <div class="watch-card" id="watch-spo2">
+                        <div class="watch-icon">🫁</div>
+                        <div class="watch-label">SpO₂</div>
+                        <div class="watch-value" style="color:#00e5ff;">--</div>
+                        <div class="watch-unit">%</div>
+                    </div>
+                    <div class="watch-card" id="watch-stress">
+                        <div class="watch-icon">🧠</div>
+                        <div class="watch-label">Stress</div>
+                        <div class="watch-value" style="color:#8b5cf6;">--</div>
+                        <div class="watch-unit">/100</div>
+                    </div>
+                    <div class="watch-card" id="watch-steps">
+                        <div class="watch-icon">👟</div>
+                        <div class="watch-label">Live Steps</div>
+                        <div class="watch-value" style="color:#00ff88;">--</div>
+                        <div class="watch-unit">today</div>
+                    </div>
+                    <div class="watch-card" id="watch-cal">
+                        <div class="watch-icon">🔥</div>
+                        <div class="watch-label">Calories</div>
+                        <div class="watch-value" style="color:#ff6b35;">--</div>
+                        <div class="watch-unit">kcal</div>
+                    </div>
+                </div>
+                <div class="watch-chart-section">
+                    <h3 class="chart-title">Heart Rate — Last 30 Readings</h3>
+                    <canvas id="hrChart" width="800" height="200"></canvas>
+                </div>
+                <div style="text-align:center; margin-top:1.5rem;">
+                    <button class="btn btn-primary" onclick="refreshWatch()">⌚ Refresh Watch Data</button>
+                </div>
+            </section>
+
+            <!-- ─── HISTORY ─── -->
+            <section class="page-section" id="page-history">
+                <div class="section-header">
+                    <h2>📈 Health History</h2>
+                    <p>Track your health score over time — save logs from the Dashboard</p>
+                </div>
+                <div id="historyContent">
+                    <div class="dashboard-placeholder">
+                        <div class="placeholder-icon">📋</div>
+                        <p>Loading history...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ─── CHATBOT ─── -->
+            <section class="page-section" id="page-chatbot">
+                <div class="section-header">
+                    <h2>💬 AI Medical Assistant</h2>
+                    <p>Ask health questions — powered by local RAG &amp; Ollama AI</p>
+                </div>
+                
+                <div class="upload-container" style="text-align: center; margin-bottom: 1rem;">
+                    <input type="file" id="documentUpload" accept=".pdf,.txt" style="display: none;" onchange="uploadDocument()">
+                    <button class="btn btn-secondary" onclick="document.getElementById('documentUpload').click()">📄 Upload Knowledge Document</button>
+                    <span id="uploadStatus" style="margin-left: 10px; font-size: 0.9rem; color: #a0aec0;"></span>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-card">
+                        <div class="chat-header">
+                            <div class="chat-avatar">🤖</div>
+                            <div class="chat-status">
+                                <span class="name">HealthTwin AI</span>
+                                <span class="status">Online</span>
+                            </div>
+                        </div>
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-bubble assistant">
+                                👋 Hi! I'm your HealthTwin AI assistant. Ask me anything about health, symptoms, wellness, or medical conditions. I'm here to help!
+
+⚠️ Remember: I provide general information only — always consult a healthcare professional for medical advice.
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chatInput" placeholder="Ask a health question..." 
+                                   onkeydown="if(event.key==='Enter') sendChat()">
+                            <button class="chat-send-btn" id="chatSendBtn" onclick="sendChat()">➤</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+        <p>⚕️ HealthTwin v1.0 — AI-powered health predictions are for educational purposes only. Always consult a medical professional.</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

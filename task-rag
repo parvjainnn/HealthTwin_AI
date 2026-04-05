@@ -1,0 +1,12 @@
+# RAG Chatbot Implementation in HealthTwin
+
+## Tasks
+- [/] Plan: Research both projects and create implementation plan
+- [ ] Create [.env](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/medical-chatbot/.env) file at project root with GROQ_API_KEY
+- [ ] Rewrite [app/services/chatbot.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/services/chatbot.py) → RAG-based using FAISS + Groq
+- [ ] Update [app/routers/chatbot.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/routers/chatbot.py) to include source documents
+- [ ] Update [app/models/schemas.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/models/schemas.py) ChatResponse to include sources
+- [ ] Update [app/main.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/main.py) to load .env and initialize RAG on startup
+- [ ] Update frontend [index.html](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/static/index.html) chatbot section description
+- [ ] Update [app/static/js/app.js](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/static/js/app.js) to display RAG source info
+- [ ] Verify: Run the application and test the chatbot
