@@ -4,10 +4,14 @@
     "slug": "healthtwin-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
+    "newArchEnabled": true,
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
     ],
+    "extra": {
+      "apiBaseUrl": "http://10.0.2.2:5000"
+    },
     "ios": {
       "supportsTablet": true
     },
