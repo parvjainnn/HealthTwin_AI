@@ -1,4 +1,5 @@
 """OCR helpers for uploaded medical bills and prescriptions."""
+import os
 from functools import lru_cache
 from pathlib import Path
 
@@ -6,13 +7,45 @@ from pypdf import PdfReader
 
 
 IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.webp'}
+BASE_DIR = Path(__file__).resolve().parent.parent
+PADDLE_CACHE_DIR = BASE_DIR / '.paddle_cache'
+PADDLE_OCR_HOME = BASE_DIR / '.paddleocr'
+PADDLE_PDX_CACHE_DIR = BASE_DIR / '.paddlex'
+MATPLOTLIB_CACHE_DIR = BASE_DIR / '.matplotlib'
+PADDLE_HOME_ROOT = BASE_DIR
+
+
+def _ensure_paddle_environment():
+    PADDLE_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    PADDLE_OCR_HOME.mkdir(parents=True, exist_ok=True)
+    PADDLE_PDX_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    MATPLOTLIB_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    os.environ['HOME'] = str(PADDLE_HOME_ROOT)
+    os.environ['USERPROFILE'] = str(PADDLE_HOME_ROOT)
+    os.environ['PADDLE_HOME'] = str(PADDLE_CACHE_DIR)
+    os.environ['XDG_CACHE_HOME'] = str(PADDLE_CACHE_DIR)
+    os.environ['PADDLE_OCR_HOME'] = str(PADDLE_OCR_HOME)
+    os.environ['PADDLE_PDX_CACHE_HOME'] = str(PADDLE_PDX_CACHE_DIR)
+    os.environ['PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK'] = 'True'
+    os.environ['MPLCONFIGDIR'] = str(MATPLOTLIB_CACHE_DIR)
+    os.environ['FLAGS_use_mkldnn'] = '0'
 
 
 @lru_cache(maxsize=1)
 def _get_paddle_ocr():
+    _ensure_paddle_environment()
     from paddleocr import PaddleOCR
 
-    return PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
+    return PaddleOCR(
+        lang='en',
+        ocr_version='PP-OCRv4',
+        device='cpu',
+        enable_mkldnn=False,
+        cpu_threads=1,
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False,
+    )
 
 
 def extract_document_text(file_path):
@@ -72,19 +105,14 @@ def _extract_image_text(path):
         }
 
     try:
-        result = ocr.ocr(str(path), cls=True)
+        result = ocr.predict(str(path))
         lines = []
         for page in result or []:
-            for item in page or []:
-                if not item or len(item) < 2:
-                    continue
-                text_block = item[1]
-                if isinstance(text_block, (list, tuple)) and text_block:
-                    value = str(text_block[0]).strip()
-                else:
-                    value = str(text_block).strip()
-                if value:
-                    lines.append(value)
+            page_data = _normalize_ocr_result(page)
+            for value in page_data.get('rec_texts', []):
+                cleaned = str(value).strip()
+                if cleaned:
+                    lines.append(cleaned)
 
         combined = '\n'.join(lines).strip()
         if combined:
@@ -108,3 +136,25 @@ def _extract_image_text(path):
             'status': 'failed',
             'message': f'PaddleOCR failed: {exc}',
         }
+
+
+def _normalize_ocr_result(result_item):
+    if isinstance(result_item, dict):
+        return result_item.get('res', result_item)
+
+    if hasattr(result_item, 'json'):
+        json_value = getattr(result_item, 'json')
+        if isinstance(json_value, dict):
+            return json_value.get('res', json_value)
+
+    if hasattr(result_item, 'res'):
+        res_value = getattr(result_item, 'res')
+        if isinstance(res_value, dict):
+            return res_value
+
+    if hasattr(result_item, 'to_dict'):
+        dict_value = result_item.to_dict()
+        if isinstance(dict_value, dict):
+            return dict_value.get('res', dict_value)
+
+    return {}

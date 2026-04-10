@@ -52,7 +52,8 @@ orjson==3.10.18; platform_python_implementation != 'PyPy'
 packaging==24.2; python_version >= '3.8'
 pandas==2.3.1; python_version >= '3.9'
 pillow==11.3.0; python_version >= '3.9'
-paddleocr==2.8.1
+paddlepaddle>=3.0.0,<4
+paddleocr>=3.0.0,<4
 propcache==0.3.2; python_version >= '3.9'
 protobuf==6.31.1; python_version >= '3.9'
 pyarrow==20.0.0; python_version >= '3.9'
