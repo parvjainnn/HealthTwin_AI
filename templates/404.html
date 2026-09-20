@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Page Not Found{% endblock %}
+{% block meta_description %}The requested HealthTwin page could not be found. Return home to explore health tracking and AI-assisted tools.{% endblock %}
+{% block content %}
+<section class="error-page container" aria-labelledby="not-found-title">
+    <p class="landing-eyebrow">Error 404</p>
+    <h1 id="not-found-title">This page is not part of your health workspace.</h1>
+    <p>The link may be out of date, or the page may have moved. You can return home or continue with the main HealthTwin tools.</p>
+    <div class="landing-actions"><a class="landing-primary-action" href="{{ url_for('health.index') }}">Go to HealthTwin home <span>→</span></a><a class="landing-text-action" href="{{ url_for('auth.login') }}">Sign in <span>↗</span></a></div>
+</section>
+{% endblock %}

@@ -1,0 +1,44 @@
+# Walkthrough: RAG Chatbot Implementation
+
+## Summary
+
+Replaced the Ollama-based chatbot in HealthTwin with a **RAG (Retrieval-Augmented Generation)** pipeline, matching the `medical-chatbot` reference project.
+
+## Architecture
+
+```mermaid
+graph LR
+    A[User Question] --> B[FastAPI /api/chat]
+    B --> C[FAISS Vectorstore]
+    C --> D["Top-3 Documents"]
+    D --> E[Groq LLM<br>llama-3.1-8b-instant]
+    E --> F[Answer + Sources]
+    F --> G[Frontend Chat UI]
+```
+
+## Files Changed
+
+| File | Change |
+|------|--------|
+| [chatbot.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/services/chatbot.py) | **Rewritten** — RAG pipeline (FAISS + Groq + LangChain) |
+| [schemas.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/models/schemas.py) | Added [SourceDocument](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/models/schemas.py#72-75) model, `sources` field on [ChatResponse](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/models/schemas.py#77-81) |
+| [chatbot.py (router)](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/routers/chatbot.py) | Calls [chat_with_rag](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/services/chatbot.py#83-86) instead of `chat_with_ollama` |
+| [main.py](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/main.py) | Added `dotenv.load_dotenv()` at startup |
+| [.env](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/.env) | **New** — holds `GROQ_API_KEY` |
+| [index.html](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/static/index.html) | Updated subtitle to "powered by RAG & Groq AI" |
+| [app.js](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/app/static/js/app.js) | Added collapsible "📚 Sources" display below replies |
+
+## Verification
+
+- ✅ Server starts successfully with `venv\Scripts\python -m uvicorn app.main:app --reload`
+- ✅ `/health` endpoint returns `{"status": "healthy", "app": "HealthTwin"}`
+
+## To Test the Chatbot
+
+> [!IMPORTANT]
+> You **must** set your `GROQ_API_KEY` in the [.env](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/.env) file before the chatbot will work.
+
+1. Open [.env](file:///c:/Users/ASUS/Documents/WebD/HackathonProject/healthtwin/.env) and paste your Groq API key
+2. Run `venv\Scripts\python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload`
+3. Open `http://localhost:8000` → click **💬 AI Chat**
+4. Ask "What is diabetes?" and verify you get a RAG-powered response with source references

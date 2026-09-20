@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Thank You{% endblock %}
+{% block meta_description %}Your HealthTwin action was completed successfully. Return to your health workspace to continue.{% endblock %}
+{% block robots %}noindex,nofollow{% endblock %}
+{% block content %}
+<section class="error-page container" aria-labelledby="thank-you-title">
+    <p class="landing-eyebrow">All set</p>
+    <h1 id="thank-you-title">Thank you. Your action was completed.</h1>
+    <p>You can return to HealthTwin whenever you are ready to continue tracking, reviewing, or exploring your health information.</p>
+    <div class="landing-actions"><a class="landing-primary-action" href="{{ url_for('health.index') }}">Return home <span>→</span></a></div>
+</section>
+{% endblock %}

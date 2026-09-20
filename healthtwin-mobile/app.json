@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "HealthTwin",
+    "slug": "healthtwin-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "newArchEnabled": true,
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "extra": {
+      "apiBaseUrl": "http://10.0.2.2:5000",
+      "eas": {
+        "projectId": "fa11fbba-9c63-4445-9e44-e719fa6b3e23"
+      }
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#e9f8ee"
+      },
+      "package": "com.parvjainnn.healthtwinmobile"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

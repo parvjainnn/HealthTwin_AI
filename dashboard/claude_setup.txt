@@ -1,0 +1,67 @@
+The user wants to set up Claude Code's experimental **Agent Teams** feature. Let me check if Claude Code is installed and then configure the settings.
+
+Ran command: `claude --version 2>&1`
+
+Claude Code is not installed on your system. Let me set it up for you.
+
+Installing Claude Code CLI and enabling the experimental Agent Teams feature.
+
+Ran command: `node --version 2>&1`
+
+Good, Node.js v22.16.0 is available. Now let me check npm and install Claude Code:
+
+Ran command: `npm --version 2>&1`
+
+npm 10.9.2 is available. Now let me install Claude Code globally:
+
+Ran command: `npm install -g @anthropic-ai/claude-code 2>&1`
+
+Claude Code installed successfully. Now let me verify the installation and set up the agent teams configuration:
+
+Installed Claude Code CLI globally via npm. Node.js v22.16.0 and npm 10.9.2 are available.
+
+Ran command: `claude --version 2>&1`
+
+Claude Code **v2.1.77** is installed (well above the v2.1.32 minimum required for agent teams). Now let me configure the settings to enable Agent Teams:
+
+Ran command: `if (!(Test-Path "$env:USERPROFILE\.claude")) { New-Item -ItemType Directory -Path "$env:USERPROFILE\.claude" -Force }; if (Test-Path "$env:USERPROFILE\.claude\settings.json") { Get-Content "$env:USERPROFILE\.claude\settings.json" } else { Write-Output "NOT_FOUND" }`
+
+No existing settings.json. Let me create it with the Agent Teams configuration:
+
+Created settings.json
+
+Now let me verify the settings file was created correctly and check everything is working:
+
+Installed Claude Code v2.1.77 globally via npm. Created `~/.claude/settings.json` with `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` enabled.
+
+Ran command: `Get-Content "$env:USERPROFILE\.claude\settings.json"`
+
+Everything is set up. Let me notify the user with the results.
+
+✅ **Claude Code Agent Teams is set up!** Here's what was done:
+
+| Step | Status |
+|---|---|
+| **Claude Code CLI** installed globally via npm | ✅ **v2.1.77** (requires ≥ v2.1.32) |
+| **Agent Teams** enabled in `~/.claude/settings.json` | ✅ `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1"` |
+
+### How to use it
+
+1. Open a terminal and run `claude` to start a Claude Code session
+2. You'll need to authenticate with your Anthropic API key on first run
+3. Then ask Claude to create an agent team, for example:
+   ```
+   Create an agent team to review this codebase from different angles:
+   one on architecture, one on security, one on test coverage.
+   ```
+
+### Display mode
+By default it uses **in-process mode** (all teammates in one terminal). Use **Shift+Down** to cycle through teammates. 
+
+> **Note:** Split-pane mode (`tmux`) has known limitations on Windows. The in-process mode works in any terminal and is the recommended option on Windows.
+
+### Key things to know
+- Agent teams use **significantly more tokens** than a single session
+- Start with **3-5 teammates** for best results
+- Teammates **don't share** conversation history — provide context in spawn prompts
+- Ask the lead to **clean up the team** when done

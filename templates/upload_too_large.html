@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Upload Too Large{% endblock %}
+{% block meta_description %}The uploaded file exceeds the HealthTwin upload limit.{% endblock %}
+{% block content %}
+<section class="error-page container" aria-labelledby="upload-limit-title">
+    <p class="landing-eyebrow">Upload limit</p>
+    <h1 id="upload-limit-title">This file is larger than the upload limit.</h1>
+    <p>Please choose a document smaller than 16 MB, then try uploading it again. Supported document formats are listed in your HealthTwin workspace.</p>
+    <div class="landing-actions"><a class="landing-primary-action" href="{{ url_for('health.records_page') }}">Return to records <span>→</span></a><a class="landing-text-action" href="{{ url_for('health.index') }}">Go home <span>↗</span></a></div>
+</section>
+{% endblock %}

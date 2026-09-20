@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HealthTwin{% endblock %} | HealthTwin</title>
+    <meta name="description" content="{% block meta_description %}HealthTwin brings health tracking, AI-assisted education, prediction tools, and medical records into one secure workspace.{% endblock %}">
+    <meta name="robots" content="{% block robots %}index,follow{% endblock %}">
+    <link rel="canonical" href="{{ site_url }}{{ request.path }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="HealthTwin">
+    <meta property="og:title" content="{% block og_title %}{{ self.title()|striptags|trim }} | HealthTwin{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}HealthTwin brings health tracking, AI-assisted education, prediction tools, and medical records into one secure workspace.{% endblock %}">
+    <meta property="og:url" content="{{ site_url }}{{ request.path }}">
+    <meta property="og:image" content="{{ site_url }}{{ url_for('static', filename='social-preview.svg') }}">
+    <meta property="og:image:alt" content="HealthTwin — personal health intelligence">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ self.title()|striptags|trim }} | HealthTwin{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}HealthTwin brings health tracking, AI-assisted education, prediction tools, and medical records into one secure workspace.{% endblock %}">
+    <meta name="twitter:image" content="{{ site_url }}{{ url_for('static', filename='social-preview.svg') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.svg') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='site.webmanifest') }}">
+    <meta name="theme-color" content="#0b8fa5">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('healthtwin-theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark-theme');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_v2.css') }}?v=20260826-landing">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="{% if current_user.is_authenticated %}has-bottom-nav{% endif %}">
+    <div class="page-orb page-orb-a"></div>
+    <div class="page-orb page-orb-b"></div>
+    <div class="page-grid"></div>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <a href="{{ url_for('health.index') }}" class="logo">
+                <span class="logo-icon">🧬</span>
+                <span>HealthTwin</span>
+            </a>
+            <div class="language-switcher">
+                <label class="sr-only" for="languageSelect" data-i18n="language.label">Language</label>
+                <select id="languageSelect" class="language-select" aria-label="Select language">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="ta">Tamil</option>
+                </select>
+            </div>
+            <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+                <span class="theme-toggle-icon" id="themeToggleIcon">☾</span>
+                <span class="theme-toggle-text" id="themeToggleText" data-i18n="theme.dark">Dark</span>
+            </button>
+            {% if current_user.is_authenticated %}
+            <div class="nav-user">
+                <span class="nav-username">👤 {{ current_user.username }}</span>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout" data-i18n="auth.logout">Logout</a>
+            </div>
+            {% else %}
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{{ url_for('health.index') }}" data-i18n="nav.home">Home</a></li>
+            </ul>
+            <div class="nav-auth">
+                <a href="{{ url_for('auth.login') }}" class="btn-nav-login" data-i18n="auth.login">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-nav-register" data-i18n="auth.register">Register</a>
+            </div>
+            {% endif %}
+            {% if not current_user.is_authenticated %}
+            <button class="mobile-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="navLinks" onclick="toggleMobileNavigation(this)">☰</button>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-container">
+        {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">
+            {{ msg }}
+            <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <main class="main-content" id="main-content">
+        {% if request.endpoint and request.endpoint not in ['health.index', 'auth.login', 'auth.register'] %}
+        <nav class="breadcrumbs container" aria-label="Breadcrumb">
+            <a href="{{ url_for('health.index') }}">Home</a><span aria-hidden="true">/</span><span aria-current="page">{{ self.title()|striptags|trim }}</span>
+        </nav>
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if current_user.is_authenticated %}
+    <nav class="bottom-nav" aria-label="Primary navigation">
+        <a href="{{ url_for('health.dashboard') }}" class="bottom-nav-link {% if request.endpoint == 'health.dashboard' %}active{% endif %}" data-i18n="nav.dashboard">📊 Dashboard</a>
+        <a href="{{ url_for('health.history_page') }}" class="bottom-nav-link {% if request.endpoint == 'health.history_page' %}active{% endif %}" data-i18n="nav.history">📈 History</a>
+        <a href="{{ url_for('health.records_page') }}" class="bottom-nav-link {% if request.endpoint == 'health.records_page' %}active{% endif %}" data-i18n="nav.records">🧾 Records</a>
+        <a href="{{ url_for('predictions.diabetes_page') }}" class="bottom-nav-link {% if request.endpoint == 'predictions.diabetes_page' %}active{% endif %}" data-i18n="nav.diabetes">🩸 Diabetes</a>
+        <a href="{{ url_for('predictions.heart_page') }}" class="bottom-nav-link {% if request.endpoint == 'predictions.heart_page' %}active{% endif %}" data-i18n="nav.heart">❤️ Heart</a>
+        <a href="{{ url_for('predictions.brain_tumor_page') }}" class="bottom-nav-link {% if request.endpoint == 'predictions.brain_tumor_page' %}active{% endif %}" data-i18n="nav.brain">🧠 Brain Tumor</a>
+        <a href="{{ url_for('health.watch_page') }}" class="bottom-nav-link {% if request.endpoint == 'health.watch_page' %}active{% endif %}" data-i18n="nav.watch">⌚ Watch</a>
+        <a href="{{ url_for('chatbot.chatbot_page') }}" class="bottom-nav-link {% if request.endpoint == 'chatbot.chatbot_page' %}active{% endif %}" data-i18n="nav.chat">💬 AI Chat</a>
+    </nav>
+    {% endif %}
+
+    <footer class="footer">
+        <p data-i18n="footer.disclaimer">⚕️ HealthTwin v2.0 — AI-powered health predictions are for educational purposes only. Always consult a medical professional.</p>
+        <p class="footer-legal"><a href="{{ url_for('health.about') }}">About</a><span aria-hidden="true">·</span><a href="{{ url_for('health.privacy') }}">Privacy Policy</a><span aria-hidden="true">·</span><a href="{{ url_for('health.terms') }}">Terms &amp; Conditions</a></p>
+    </footer>
+
+    <section class="cookie-consent" id="cookieConsent" aria-label="Cookie preferences" hidden>
+        <p><strong>Your privacy matters.</strong> HealthTwin uses essential storage for preferences. Optional analytics is only enabled with your permission. <a href="{{ url_for('health.privacy') }}">Learn more</a></p>
+        <div><button class="btn btn-secondary" type="button" id="cookieReject">Essential only</button><button class="btn btn-primary" type="button" id="cookieAccept">Accept analytics</button></div>
+    </section>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>window.HEALTHTWIN_ANALYTICS = {{ {'domain': analytics_domain, 'scriptUrl': analytics_script_url}|tojson }};</script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "HealthTwin",
+  "short_name": "HealthTwin",
+  "description": "Personal health intelligence, made calmer and clearer.",
+  "icons": [{"src": "/static/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}],
+  "theme_color": "#0b8fa5",
+  "background_color": "#071d2a",
+  "display": "standalone"
+}

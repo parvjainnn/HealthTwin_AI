@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}About HealthTwin{% endblock %}
+{% block meta_description %}Learn how HealthTwin brings health tracking, records, prediction tools, and educational AI assistance into one workspace.{% endblock %}
+{% block content %}
+<section class="error-page container" aria-labelledby="about-title">
+    <p class="landing-eyebrow">About HealthTwin</p>
+    <h1 id="about-title">A calmer workspace for personal health information.</h1>
+    <p>HealthTwin brings health tracking, medical records, prediction tools, and educational AI assistance together in one place. It is designed to support understanding and preparation, not to replace professional medical care.</p>
+    <div class="landing-actions">
+        <a class="landing-primary-action" href="{{ url_for('health.index') }}">Explore HealthTwin <span>→</span></a>
+        <a class="landing-text-action" href="{{ url_for('auth.register') }}">Create an account <span>↗</span></a>
+    </div>
+</section>
+{% endblock %}
